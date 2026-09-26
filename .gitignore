@@ -4,6 +4,9 @@ _smoke_*.mjs
 _verify_*.mjs
 _audit_*.mjs
 
+# 含密钥的推送脚本（不要提交到公开仓库）
+_push_api.ps1
+
 # 调试截图
 _*.png
 
