@@ -1,0 +1,32 @@
+# 临时调试 / 探测 / 烟雾测试脚本
+_probe_*.mjs
+_smoke_*.mjs
+_verify_*.mjs
+_audit_*.mjs
+
+# 调试截图
+_*.png
+
+# 临时 Python 辅助脚本
+_remove_roof.py
+_update_tests_roof.py
+
+# 日志
+_serve.log
+*.log
+
+# 工具 / IDE 生成目录
+.arts/
+.codeartsdoer/
+.vscode/
+.idea/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 编辑器临时文件
+*.swp
+*.swo
+*~

@@ -1,0 +1,1305 @@
+{
+  "tp3dVersion": 1,
+  "name": "彩色示意图3D",
+  "updatedAt": 1789539992650,
+  "doc": {
+    "name": "彩色示意图3D",
+    "wallH": 2.6,
+    "levels": [
+      {
+        "name": "1F",
+        "elev": 0
+      }
+    ],
+    "walls": [
+      {
+        "ax": -13.767,
+        "az": -9.4,
+        "bx": 13.767,
+        "bz": -9.4,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": 13.767,
+        "az": -9.4,
+        "bx": 13.767,
+        "bz": 3.2,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": 13.767,
+        "az": 3.2,
+        "bx": 0.967,
+        "bz": 3.2,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": 0.967,
+        "az": 3.2,
+        "bx": 0.967,
+        "bz": 9.4,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": 0.967,
+        "az": 9.4,
+        "bx": -13.767,
+        "bz": 9.4,
+        "th": 0.12,
+        "openings": [
+          {
+            "type": "window",
+            "t": 0.28213174469725905,
+            "width": 0.9,
+            "height": 1.65,
+            "sill": 0.9,
+            "leafColor": "#7a5230",
+            "leafTex": "wood",
+            "kind": "fixed",
+            "shape": "square"
+          },
+          {
+            "type": "window",
+            "t": 0.832290006569115,
+            "width": 0.9,
+            "height": 1.65,
+            "sill": 0.9,
+            "leafColor": "#7a5230",
+            "leafTex": "wood",
+            "kind": "fixed"
+          },
+          {
+            "type": "window",
+            "t": 0.8986034685271986,
+            "width": 0.9,
+            "height": 1.65,
+            "sill": 0.9,
+            "leafColor": "#7a5230",
+            "leafTex": "wood",
+            "kind": "fixed"
+          },
+          {
+            "type": "window",
+            "t": 0.4887743462814813,
+            "width": 0.9,
+            "height": 1.65,
+            "sill": 0.9,
+            "leafColor": "#7a5230",
+            "leafTex": "wood",
+            "kind": "fixed"
+          },
+          {
+            "type": "window",
+            "t": 0.5430590216198737,
+            "width": 0.9,
+            "height": 1.65,
+            "sill": 0.9,
+            "leafColor": "#7a5230",
+            "leafTex": "wood",
+            "kind": "fixed"
+          }
+        ],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": -13.767,
+        "az": 9.4,
+        "bx": -13.767,
+        "bz": -9.4,
+        "th": 0.12,
+        "openings": [
+          {
+            "type": "window",
+            "t": 0.21553200637713466,
+            "width": 0.9,
+            "height": 1.65,
+            "sill": 0.9,
+            "leafColor": "#7a5230",
+            "leafTex": "wood",
+            "kind": "fixed"
+          },
+          {
+            "type": "window",
+            "t": 0.16588703258558218,
+            "width": 0.9,
+            "height": 1.65,
+            "sill": 0.9,
+            "leafColor": "#7a5230",
+            "leafTex": "wood",
+            "kind": "fixed"
+          },
+          {
+            "type": "window",
+            "t": 0.11715816181716675,
+            "width": 0.9,
+            "height": 1.65,
+            "sill": 0.9,
+            "leafColor": "#7a5230",
+            "leafTex": "wood",
+            "kind": "fixed"
+          }
+        ],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": -13.716999999999999,
+        "az": -5.667,
+        "bx": -9.517,
+        "bz": -5.667,
+        "th": 0.12,
+        "openings": [
+          {
+            "type": "door",
+            "t": 0.8661495324112577,
+            "width": 0.9,
+            "height": 2.05,
+            "kind": "single",
+            "hinge": -1,
+            "flip": false,
+            "leafColor": "#f0ead6",
+            "glassColor": "#cccccc"
+          }
+        ],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": -13.716999999999999,
+        "az": -3.417,
+        "bx": -9.517,
+        "bz": -3.417,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": -13.866999999999999,
+        "az": -1.0670000000000002,
+        "bx": -9.667,
+        "bz": -1.0670000000000002,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": -9.567,
+        "az": -9.4,
+        "bx": -9.567,
+        "bz": 9.4,
+        "th": 0.12,
+        "openings": [
+          {
+            "type": "door",
+            "t": 0.14627455652692792,
+            "width": 0.9,
+            "height": 2.05,
+            "kind": "single",
+            "hinge": -1,
+            "flip": true,
+            "leafColor": "#7a5230",
+            "glassColor": "#cccccc"
+          },
+          {
+            "type": "door",
+            "t": 0.2797896912794189,
+            "width": 0.9,
+            "height": 2.05,
+            "kind": "single",
+            "hinge": -1,
+            "flip": true,
+            "leafColor": "#7a5230",
+            "glassColor": "#cccccc"
+          },
+          {
+            "type": "door",
+            "t": 0.7693098099050368,
+            "width": 0.9,
+            "height": 2.05,
+            "kind": "single",
+            "hinge": -1,
+            "flip": true,
+            "leafColor": "#7a5230",
+            "glassColor": "#cccccc"
+          },
+          {
+            "type": "door",
+            "t": 0.5383508387111714,
+            "width": 0.8,
+            "height": 2.05,
+            "kind": "single",
+            "hinge": -1,
+            "flip": true,
+            "leafColor": "#7a5230",
+            "glassColor": "#cccccc"
+          },
+          {
+            "type": "door",
+            "t": 0.4112266771619554,
+            "width": 0.8,
+            "height": 2.05,
+            "kind": "single",
+            "hinge": -1,
+            "flip": true,
+            "leafColor": "#7a5230",
+            "glassColor": "#cccccc"
+          },
+          {
+            "type": "door",
+            "t": 0.6617370816498491,
+            "width": 0.8,
+            "height": 2.05,
+            "kind": "single",
+            "hinge": -1,
+            "flip": true,
+            "glassColor": "#cfe6f2",
+            "leafColor": "#7a5230"
+          }
+        ],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": -9.717,
+        "az": 6.183,
+        "bx": -1.65,
+        "bz": 6.2829999999999995,
+        "th": 0.12,
+        "openings": [
+          {
+            "type": "door",
+            "t": 0.3120365876934945,
+            "width": 0.9,
+            "height": 2.05,
+            "kind": "single",
+            "hinge": -1,
+            "flip": true,
+            "shape": "circle",
+            "leafColor": "#7a5230"
+          },
+          {
+            "type": "door",
+            "t": 0.831201610920926,
+            "width": 0.9,
+            "height": 2.05,
+            "kind": "single",
+            "hinge": -1,
+            "flip": true,
+            "leafColor": "#7a5230"
+          }
+        ],
+        "lv": 0,
+        "wallBase": "#f0ead6",
+        "halfWall": true,
+        "halfHeight": 1.2,
+        "wallTex": "wood",
+        "glass": true
+      },
+      {
+        "ax": -4.699999999999999,
+        "az": 6.133,
+        "bx": -4.699999999999999,
+        "bz": 9.4,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": -7.300000000000001,
+        "az": -3.699999999999998,
+        "bx": -0.9329999999999998,
+        "bz": -3.632999999999998,
+        "th": 0.12,
+        "openings": [
+          {
+            "type": "door",
+            "t": 0.376816378670565,
+            "width": 0.9,
+            "height": 2.05,
+            "kind": "single",
+            "hinge": -1,
+            "flip": true,
+            "leafColor": "#7a5230",
+            "glassColor": "#cccccc"
+          },
+          {
+            "type": "door",
+            "t": 0.8842925009226493,
+            "width": 0.9,
+            "height": 2.05,
+            "kind": "single",
+            "hinge": -1,
+            "flip": true,
+            "leafColor": "#7a5230",
+            "glassColor": "#cccccc"
+          }
+        ],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": -7.3500000000000005,
+        "az": 0.45,
+        "bx": -7.3500000000000005,
+        "bz": 3.3000000000000003,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": -3.9830000000000005,
+        "az": -3.6329999999999982,
+        "bx": -3.9830000000000005,
+        "bz": -1.0330000000000004,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": -7.300000000000001,
+        "az": -1.0000000000000004,
+        "bx": -0.383,
+        "bz": -1.0330000000000004,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": -7.300000000000001,
+        "az": 0.45,
+        "bx": 2.5,
+        "bz": 0.45,
+        "th": 0.12,
+        "openings": [
+          {
+            "type": "door",
+            "t": 0.1314812881875582,
+            "width": 0.9,
+            "height": 2.05,
+            "kind": "single",
+            "hinge": -1,
+            "flip": true,
+            "leafColor": "#7a5230",
+            "glassColor": "#cccccc"
+          },
+          {
+            "type": "door",
+            "t": 0.8584073162012023,
+            "width": 0.9,
+            "height": 2.05,
+            "kind": "single",
+            "hinge": -1,
+            "flip": true,
+            "leafColor": "#7a5230",
+            "glassColor": "#cccccc"
+          },
+          {
+            "type": "door",
+            "t": 0.6265176259069554,
+            "width": 0.8,
+            "height": 2.05,
+            "kind": "single",
+            "hinge": -1,
+            "flip": true,
+            "leafColor": "#7a5230",
+            "glassColor": "#cccccc"
+          }
+        ],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": -7.3500000000000005,
+        "az": 3.3000000000000003,
+        "bx": -0.3829999999999997,
+        "bz": 3.2170000000000005,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": 0.30000000000000004,
+        "az": 0.4,
+        "bx": 0.3670000000000004,
+        "bz": 3.1170000000000004,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": -0.9329999999999998,
+        "az": -3.6329999999999982,
+        "bx": 1.5330000000000001,
+        "bz": -3.6329999999999982,
+        "th": 0.12,
+        "openings": [
+          {
+            "type": "door",
+            "t": 0.4594484995944849,
+            "width": 0.9,
+            "height": 2.05,
+            "kind": "single",
+            "hinge": -1,
+            "flip": true,
+            "leafColor": "#7a5230"
+          }
+        ],
+        "lv": 0,
+        "wallBase": "#f0ead6",
+        "halfWall": true,
+        "halfHeight": 1.2,
+        "wallTex": "wood",
+        "glass": true
+      },
+      {
+        "ax": -0.9829999999999999,
+        "az": -3.6329999999999982,
+        "bx": -0.9829999999999999,
+        "bz": -1.0330000000000004,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": 1.483,
+        "az": -3.6329999999999982,
+        "bx": 1.483,
+        "bz": -1.0330000000000004,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#f0ead6",
+        "halfWall": true,
+        "halfHeight": 1.2,
+        "wallTex": "wood",
+        "glass": true
+      },
+      {
+        "ax": -0.9829999999999999,
+        "az": -1.0330000000000004,
+        "bx": 2.65,
+        "bz": -1.0000000000000004,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": 2.533,
+        "az": -3.6329999999999982,
+        "bx": 4.7,
+        "bz": -3.6500000000000004,
+        "th": 0.12,
+        "openings": [
+          {
+            "type": "door",
+            "t": 0.5250058561764459,
+            "width": 0.8,
+            "height": 2.05,
+            "kind": "single",
+            "hinge": -1,
+            "flip": true,
+            "leafColor": "#7a5230"
+          }
+        ],
+        "lv": 0,
+        "wallBase": "#f0ead6",
+        "halfWall": true,
+        "halfHeight": 1.2,
+        "wallTex": "wood",
+        "glass": true
+      },
+      {
+        "ax": 2.4829999999999997,
+        "az": -3.6329999999999982,
+        "bx": 2.4829999999999997,
+        "bz": -1.0330000000000004,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": 4.65,
+        "az": -3.6500000000000004,
+        "bx": 4.6000000000000005,
+        "bz": -1.05,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#f0ead6",
+        "halfWall": true,
+        "halfHeight": 1.2,
+        "wallTex": "wood",
+        "glass": true
+      },
+      {
+        "ax": 2.4829999999999997,
+        "az": -1.0330000000000004,
+        "bx": 4.6000000000000005,
+        "bz": -1.05,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": 2.4829999999999997,
+        "az": -1.0330000000000004,
+        "bx": 2.433,
+        "bz": 3.2,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": 4.6000000000000005,
+        "az": -1.05,
+        "bx": 4.6,
+        "bz": 3.2,
+        "th": 0.12,
+        "openings": [
+          {
+            "type": "door",
+            "t": 0.5851833335523628,
+            "width": 0.8,
+            "height": 2.05,
+            "kind": "elevator",
+            "hinge": -1,
+            "flip": false,
+            "leafColor": "#7a5230",
+            "leafTex": "wood"
+          },
+          {
+            "type": "door",
+            "t": 0.27234221439437445,
+            "width": 0.8,
+            "height": 2.05,
+            "kind": "elevator",
+            "hinge": -1,
+            "flip": false,
+            "leafColor": "#7a5230",
+            "leafTex": "wood"
+          }
+        ],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": 2.433,
+        "az": 3.2,
+        "bx": 4.6,
+        "bz": 3.2,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": 5.8999999999999995,
+        "az": -9.450000000000001,
+        "bx": 6.049999999999999,
+        "bz": -5.5,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": 6.049999999999999,
+        "az": -5.5,
+        "bx": 13.917,
+        "bz": -5.45,
+        "th": 0.12,
+        "openings": [
+          {
+            "type": "door",
+            "t": 0.12730446165593987,
+            "width": 0.9,
+            "height": 2.05,
+            "kind": "single",
+            "hinge": 1,
+            "flip": true,
+            "leafColor": "#f0ead6",
+            "glassColor": "#cccccc"
+          }
+        ],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": 9.967,
+        "az": -9.4,
+        "bx": 10.05,
+        "bz": -5.15,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": 8.767,
+        "az": -0.867,
+        "bx": 11.633,
+        "bz": -0.867,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": 10.067,
+        "az": -5.183,
+        "bx": 10.067,
+        "bz": -2.717,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": 8.067,
+        "az": -2.7830000000000004,
+        "bx": 10.067,
+        "bz": -2.7830000000000004,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": 6.4670000000000005,
+        "az": -2.7830000000000004,
+        "bx": 8.467,
+        "bz": -2.7830000000000004,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": 7.817,
+        "az": -0.8670000000000009,
+        "bx": 7.817,
+        "bz": 3.132999999999999,
+        "th": 0.12,
+        "openings": [
+          {
+            "type": "door",
+            "t": 0.8285710811283649,
+            "width": 0.9,
+            "height": 2.05,
+            "kind": "single",
+            "hinge": -1,
+            "flip": false,
+            "leafColor": "#f0ead6",
+            "glassColor": "#cccccc"
+          }
+        ],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": 7.767,
+        "az": -0.867,
+        "bx": 13.767,
+        "bz": -0.867,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": -1.75,
+        "az": 0.45,
+        "bx": -1.733,
+        "bz": 3.2169999999999996,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": -7.300000000000001,
+        "az": -3.6999999999999984,
+        "bx": -7.300000000000001,
+        "bz": -1.0000000000000004,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": -0.43299999999999966,
+        "az": 3.2170000000000005,
+        "bx": 1.0670000000000006,
+        "bz": 3.2170000000000005,
+        "th": 0.12,
+        "openings": [
+          {
+            "type": "door",
+            "t": 0.6563525550867324,
+            "width": 0.85,
+            "height": 2.05,
+            "kind": "single",
+            "hinge": -1,
+            "flip": false,
+            "leafColor": "#f0ead6",
+            "glassColor": "#cccccc"
+          }
+        ],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": -1.4999999999999998,
+        "az": 6.233,
+        "bx": -1.4999999999999998,
+        "bz": 9.5,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": -13.866999999999999,
+        "az": 1.383,
+        "bx": -9.667,
+        "bz": 1.383,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      },
+      {
+        "ax": -13.766999999999998,
+        "az": 3.883,
+        "bx": -9.566999999999998,
+        "bz": 3.883,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#9fb6c9",
+        "halfWall": true,
+        "halfHeight": 1.2
+      }
+    ],
+    "floors": [],
+    "furniture": [
+      {
+        "type": "officeTable",
+        "x": -12.15,
+        "z": 6.155,
+        "rot": 12.566370614359172,
+        "lv": 0
+      },
+      {
+        "type": "officeTable",
+        "x": -12.4,
+        "z": -2.145,
+        "rot": 1.7763568394002505e-15,
+        "lv": 0
+      },
+      {
+        "type": "officeTable",
+        "x": -12.461999999999987,
+        "z": -4.399999999999997,
+        "rot": 53.40707511102649,
+        "lv": 0
+      },
+      {
+        "type": "officeTable",
+        "x": -11.05,
+        "z": -8.145000000000001,
+        "rot": 1.7763568394002505e-15,
+        "lv": 0
+      },
+      {
+        "type": "officeTable",
+        "x": -11.55,
+        "z": 2.7550000000000003,
+        "rot": 64.40264939859075,
+        "lv": 0
+      },
+      {
+        "type": "sofaRow3",
+        "x": -9.081500000000009,
+        "z": -8.300000000000004,
+        "rot": 3.141592653589786,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": 3.398,
+        "z": -5.550000000000001,
+        "rot": 3.1415926535897913,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": 3.452,
+        "z": -6.9,
+        "rot": 21.991148575128552,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": 3.3520000000000003,
+        "z": -8.2,
+        "rot": 21.991148575128552,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": 1.652,
+        "z": -5.700000000000001,
+        "rot": 3.1415926535897913,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": 1.7019999999999997,
+        "z": -7.049999999999999,
+        "rot": 21.991148575128552,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": 1.602,
+        "z": -8.349999999999998,
+        "rot": 21.991148575128552,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": 0.00199999999999996,
+        "z": -5.650000000000002,
+        "rot": 3.1415926535897913,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": 0.24800000000000005,
+        "z": -8.4,
+        "rot": 21.991148575128552,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": 0.352,
+        "z": -7,
+        "rot": 21.991148575128552,
+        "lv": 0
+      },
+      {
+        "type": "officeTable",
+        "x": -11.450000000000001,
+        "z": 0.35500000000000004,
+        "rot": 64.40264939859075,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": -12.198,
+        "z": 2.8000000000000003,
+        "rot": 1.7763568394002505e-15,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": -11.898000000000001,
+        "z": 0.35000000000000003,
+        "rot": 1.7763568394002505e-15,
+        "lv": 0
+      },
+      {
+        "type": "diningChair",
+        "x": -12.5,
+        "z": -4.8549999999999995,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": -1.6980000000000002,
+        "z": -7.149999999999995,
+        "rot": 21.991148575128552,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": -1.748,
+        "z": -5.799999999999997,
+        "rot": 3.1415926535897913,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": -1.7979999999999998,
+        "z": -8.45,
+        "rot": 21.991148575128552,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": -12.15,
+        "z": 5.084999999999998,
+        "rot": 4.974188368183835,
+        "lv": 0
+      },
+      {
+        "type": "indoorPlant",
+        "x": -12.200000000000001,
+        "z": 8.35,
+        "rot": 12.566370614359172,
+        "lv": 0
+      },
+      {
+        "type": "indoorPlant",
+        "x": 7.050000000000001,
+        "z": -0.65,
+        "rot": 15.707963267948966,
+        "lv": 0
+      },
+      {
+        "type": "indoorPlant",
+        "x": 7.095,
+        "z": 1.5,
+        "rot": 15.707963267948966,
+        "lv": 0
+      },
+      {
+        "type": "cabinetWhite",
+        "x": 13.350000000000001,
+        "z": 0.35000000000000003,
+        "rot": 4.71238898038469,
+        "lv": 0
+      },
+      {
+        "type": "stairs",
+        "x": 8.35,
+        "z": 2.500000000000001,
+        "rot": 6.283185307179583,
+        "lv": 0,
+        "scale": 0.6
+      },
+      {
+        "type": "glbDesk",
+        "x": 7.95,
+        "z": -7.3500000000000005,
+        "rot": 0,
+        "lv": 0,
+        "scale": 1.2
+      },
+      {
+        "type": "woodCabinet",
+        "x": -13.200000000000001,
+        "z": -6.663,
+        "rot": 3.1415926535897896,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": -3.8479999999999936,
+        "z": -8.450000000000003,
+        "rot": 21.991148575128552,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": -3.7479999999999944,
+        "z": -7.149999999999994,
+        "rot": 21.991148575128552,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": -3.7979999999999943,
+        "z": -5.799999999999996,
+        "rot": 3.1415926535897913,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": -5.8979999999999855,
+        "z": -8.400000000000006,
+        "rot": 21.991148575128552,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": -5.797999999999987,
+        "z": -7.099999999999993,
+        "rot": 21.991148575128552,
+        "lv": 0
+      },
+      {
+        "type": "officeChairBlk",
+        "x": -5.8479999999999865,
+        "z": -5.749999999999996,
+        "rot": 3.1415926535897913,
+        "lv": 0
+      },
+      {
+        "type": "sofaRow3",
+        "x": -10.15,
+        "z": 8,
+        "rot": 6.283185307179583,
+        "lv": 0
+      },
+      {
+        "type": "officeTable",
+        "x": 2.1,
+        "z": -2.895,
+        "rot": 1.5707963267948948,
+        "lv": 0
+      },
+      {
+        "type": "officeTable",
+        "x": 2.1,
+        "z": -1.845,
+        "rot": 1.5707963267948948,
+        "lv": 0
+      },
+      {
+        "type": "chartCabinet",
+        "x": 4.05,
+        "z": 8.05,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "walker",
+        "x": 4.4,
+        "z": 14.450000000000001,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "centrifuge",
+        "x": 6.2,
+        "z": 14.5,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "microscope",
+        "x": 3.3000000000000003,
+        "z": 14.65,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "oxygenCart",
+        "x": 3.25,
+        "z": 10.15,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "firstAidKit",
+        "x": 5.8500000000000005,
+        "z": 7.800000000000001,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "vitalsCart",
+        "x": 5.550000000000001,
+        "z": 14.05,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "vitalsCart",
+        "x": 7.050000000000001,
+        "z": 13.25,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "vitalsCart",
+        "x": 5.8500000000000005,
+        "z": 12.15,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "mobileSurgLamp",
+        "x": 5.2,
+        "z": 15.9,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "ultrasound",
+        "x": 6.8500000000000005,
+        "z": 9.35,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "ultrasound",
+        "x": 9.25,
+        "z": 9.700000000000001,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "anesthesiaMch",
+        "x": 8.25,
+        "z": 11.9,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "deliveryBed",
+        "x": 11.4,
+        "z": 16.45,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "deliveryBed",
+        "x": 8.700000000000001,
+        "z": 16.75,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "deliveryBed",
+        "x": 5.8500000000000005,
+        "z": 17.55,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "hospitalBed",
+        "x": 2.7,
+        "z": 18.95,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "medCart",
+        "x": -0.4,
+        "z": 14.05,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "infantCrib",
+        "x": 1.7000000000000002,
+        "z": 13.9,
+        "rot": 0,
+        "lv": 0
+      }
+    ],
+    "hidden": {},
+    "groups": [],
+    "assets": [],
+    "stairs": [],
+    "roofs": []
+  }
+}
