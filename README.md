@@ -1,4 +1,4 @@
-# TP3D · Floor Plan Editor / 户型编辑器
+# TP3D · AI-Powered Floor Plan Editor
 
 [English](#english) · [中文](#中文)
 
@@ -6,79 +6,88 @@
 
 ## English
 
-### TP3D · Floor Plan Editor
+### What is TP3D?
 
-A browser-based 3D floor plan editor built with vanilla JavaScript and Three.js, featuring real-time dual-view rendering (2D SVG floor plan + 3D perspective) for interior design, rapid home furnishing layout, and 3D automated modeling workflows.
+TP3D is a browser-based **AI-powered 3D floor plan editor** built with vanilla JavaScript and Three.js — no build tools, no dependencies to install, just open and go.
 
-### Features
+Unlike traditional CAD software, TP3D combines **AI generation**, **real-time dual-view rendering** (2D SVG + 3D), and a curated **3D furniture library** into a single creative workflow for interior designers, architects, and anyone who wants to visualize a space in minutes.
 
-- **Dual-mode rendering** — 2D SVG floor plan (`render2d.js`) and 3D Three.js scene (`main.js`) update simultaneously; switch freely between views
-- **Walls, Doors & Windows** — Draw walls, insert doors and windows with automatic door-handle orientation detection and wall-cutout generation
-- **Furniture Library** — 200+ furniture and equipment GLB models across Home / Office / Medical scenes, compressed with DRACO (WASM), rendered via InstancedMesh for performance
-- **Code-based Modeling** — 33+ furniture types procedurally built with code (not GLB), offering pixel-precise detail and zero external asset dependency
-- **HDRI Lighting** — Studio-quality environment lighting with Poly Haven HDRIs for realistic material reflections
-- **SSAO Ambient Occlusion** — Screen-space ambient occlusion post-processing for depth and realism
-- **Floor Textures** — PBR wood-floor textures with normal and roughness maps
-- **Floor Plan Files** — Local Python server API for silent save/load of `.tp3d.json` floor plan files with no dialogs
-- **Export** — GLTF/GLB export of the entire scene
-- **Interactions** — WASD fly-through, pan/zoom, select/delete, grid snap, Gizmo transform controls
+### The Killer Feature: AI Generation
+
+Type a description → get a complete floor plan with walls, doors, windows, and furniture. Three AI capabilities, all in the top toolbar:
+
+| Feature | What it does |
+|---|---|
+| **✨ AI 生成户型** | Describe your layout in plain Chinese — e.g. *"两室一厅 80㎡，南向客厅带阳台，主卧朝南带独立卫生间"* — and the AI generates walls, openings, and furniture placements into a new plan file. No drawing required. |
+| **🎨 AI 装修风格** | Describe a design style — e.g. *"北欧极简，白墙+浅木"* — and the AI generates 4 themed color/material packages with live previews. Pick one to apply instantly. |
+| **🪑 AI 生成家具** | Describe any furniture — e.g. *"1920s 工业风金属台灯"* — the AI generates name, category, icon, and dimensions; you drag-and-drop your own GLB file to auto-import it into the library. |
+
+All AI calls are routed through a streaming API (SSE), with real-time progress feedback. Results are parsed as structured JSON and imported directly into the scene.
+
+### Other Highlights
+
+- **Dual-mode rendering** — 2D SVG floor plan (`render2d.js`) and 3D Three.js scene (`main.js`) update simultaneously; switch views with one click
+- **Room auto-detection** — Draw wall loops → one click auto-generates floor surfaces using raster-fill room-finding algorithm
+- **200+ 3D models** — Home / Office / Medical furniture library with DRACO compression and InstancedMesh rendering
+- **33+ code-built models** — Procedurally generated furniture with zero external asset dependency
+- **HDRI + SSAO** — Poly Haven studio HDRIs for realistic reflections; screen-space ambient occlusion for depth
+- **Floor plan file format** — `.tp3d.json` with silent auto-save via local Python API; no dialogs, no interruptions
+- **Export** — GLTF/GLB scene export, DXF 2D floor plan export for AutoCAD
+- **2D/3D HTML import** — Upload any third-party 3D floor plan HTML file; AI extracts walls, floors, and furniture from its code and imports them into TP3D
 
 ### Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Frontend | Vanilla JavaScript (ES Modules) |
+| Frontend | Vanilla JavaScript (ES Modules), ~13,000 lines |
 | 3D Rendering | Three.js |
 | 2D Rendering | SVG (Browser Native Skia) |
 | Geometry | BufferGeometryUtils / three-bvh-csg / three-mesh-bvh |
 | Lighting | RGBELoader + Poly Haven HDRIs |
 | Post-processing | SSAO (three.js postprocessing) |
 | Model Compression | DRACO (WASM decode) |
+| AI Backend | MiniMax (Claude-compatible API) |
 | Local Server | Python 3 stdlib `http.server` |
 
 ### Quick Start
 
 #### Windows
 
-Double-click `启动编辑器.bat` — it starts the local server and opens the browser automatically.
+Double-click `启动编辑器.bat` — it starts the server and opens the browser automatically.
 
 #### Manual
 
 ```bash
-# Start local server (static hosting + floor plan file API)
 python _serve.py 8137
-
-# Open in browser
-# http://127.0.0.1:8137
+# Then open http://127.0.0.1:8137
 ```
 
-> Requires Python 3 added to PATH.
+> Requires Python 3 in PATH.
 
 ### Directory Structure
 
 ```
 editor/
 ├── index.html              # Main page (UI + styles, ~2500 lines)
-├── main.js                 # 3D scene core logic
+├── main.js                 # 3D scene + AI logic (~13000 lines)
 ├── render2d.js             # 2D SVG floor plan renderer
-├── _serve.py              # Local static server + floor plan file API
+├── _serve.py              # Local static server + API (AI proxy, file API)
 ├── 启动编辑器.bat           # Windows one-click launcher
 ├── json/                   # Floor plan data (.tp3d.json)
 ├── libs/
-│   ├── three.module.js     # Three.js
-│   ├── items/              # 200+ furniture/equipment GLB models
-│   ├── draco/              # DRACO WASM decoder
-│   ├── postprocessing/     # SSAO, EffectComposer, ShaderPass
-│   ├── shaders/            # CopyShader, SSAOShader, OutputShader
-│   ├── environments/       # Poly Haven HDRI studio lighting
-│   ├── textures/           # PBR wood floor textures
-│   └── ...
+│   ├── three.module.js     # Three.js core
+│   ├── items/             # 200+ furniture GLB models
+│   ├── draco/             # DRACO WASM decoder
+│   ├── postprocessing/    # SSAO, EffectComposer, ShaderPass
+│   ├── shaders/           # CopyShader, SSAOShader, OutputShader
+│   ├── environments/       # Poly Haven HDRI files
+│   └── textures/           # PBR wood floor textures
 └── utils/                  # Utility functions
 ```
 
 ### Floor Plan File Format
 
-Floor plans are saved as `.tp3d.json` in the `json/` directory, containing complete scene data: walls, doors, windows, furniture placements, materials, and camera state.
+`.tp3d.json` files in `json/` contain the complete scene: wall geometry, openings, furniture placements, materials, themes, and camera state.
 
 ### License
 
@@ -88,34 +97,47 @@ Floor plans are saved as `.tp3d.json` in the `json/` directory, containing compl
 
 ## 中文
 
-### TP3D · 户型编辑器
+### TP3D 是什么？
 
-一款基于浏览器运行的 3D 户型编辑器，使用原生 JavaScript + Three.js 构建，配备实时双视角渲染（2D SVG 平面图 + 3D 立体视角），适用于室内设计、家装方案快速搭建与 3D 自动化建模场景。
+TP3D 是一款运行在浏览器中的 **AI 驱动 3D 户型编辑器**，使用原生 JavaScript + Three.js 构建，无需安装任何依赖，打开即用。
 
-### 功能特性
+与传统 CAD 软件不同，TP3D 将 **AI 生成**、**实时双视角渲染**（2D SVG 平面图 + 3D 立体视角）和 **3D 家具库** 整合在同一个创作流程中，让室内设计师、建筑师以及任何想快速可视化空间的人，都能在几分钟内完成户型搭建。
 
-- **双模式渲染** — 2D SVG 平面图（`render2d.js`）与 3D Three.js 立体场景（`main.js`）实时同步更新，可自由切换视角
-- **墙体 / 门窗** — 画墙、插门、开窗，支持门把手方向自动判定、门窗洞口自动裁切
-- **家具库** — 内置 200+ 家具与设备 GLB 模型（家居 / 办公 / 医疗场景），DRACO 压缩 + InstancedMesh 渲染优化
-- **HDRI 光照** — 采用 Poly Haven HDRI 影棚级环境光照，呈现真实材质反射效果
-- **SSAO 环境光遮蔽** — 屏幕空间环境光遮蔽后处理，增强场景立体感与真实感
-- **地面纹理** — PBR 木地板纹理，含法线贴图与粗糙度贴图
-- **原生代码建模** — 33+ 种家具以代码程序化构建（非 GLB），精度高、无外部资产依赖
-- **户型文件管理** — 本地服务器 API 读写 `.tp3d.json` 户型文件，静默保存无弹窗
-- **导出** — 支持 GLTF/GLB 整场景导出
-- **交互操作** — WASD 漫游飞行、平移缩放、选择删除、网格吸附、Gizmo 变换操控
+### 核心亮点：AI 功能
+
+输入一段文字描述 → 直接得到完整户型平面图（含墙体、门窗、家具）。三大 AI 能力，全部集成在顶部工具栏：
+
+| 功能 | 说明 |
+|---|---|
+| **✨ AI 生成户型** | 用自然语言描述你的布局——比如 *"两室一厅 80㎡，南向客厅带阳台，主卧朝南带独立卫生间，次卧朝北"*——AI 自动生成墙体、门窗和家具，新建为一个户型文件，完全不需要手动绘图。 |
+| **🎨 AI 装修风格** | 输入风格关键词——比如 *"北欧极简，白墙+浅木"*——AI 一次生成 4 个候选主题配色包，含实时预览效果，选中即应用到当前户型。 |
+| **🪑 AI 生成家具** | 描述任何家具——比如 *"1920s 工业风金属台灯"*——AI 生成名称、分类、图标和尺寸元数据；拖入你自己的 GLB 文件即可自动入库并进入放置模式。 |
+
+所有 AI 调用均通过流式 API（SSE）实现，界面实时显示生成进度。结果以结构化 JSON 解析，直接导入场景。
+
+### 其他亮点
+
+- **双模式实时渲染** — 2D SVG 平面图（`render2d.js`）与 3D Three.js 立体场景（`main.js`）同步更新，一键切换视角
+- **自动房间识别** — 画好墙线后一键，AI 驱动的栅格填充算法自动识别围合区域并生成地面
+- **200+ 3D 模型库** — 家居 / 办公 / 医疗家具，DRACO 压缩 + InstancedMesh 渲染优化
+- **33+ 代码构建家具** — 程序化生成，零外部资产依赖，精度可控
+- **HDRI 影棚光 + SSAO** — Poly Haven HDRIs 真实材质反射；屏幕空间环境光遮蔽增强立体感
+- **户型文件静默保存** — 本地 Python API 自动读写 `.tp3d.json`，无弹窗、不打断
+- **多格式导出** — GLTF/GLB 整场景导出、DXF 平面图导出（兼容 AutoCAD）
+- **外部 3D HTML 导入** — 上传任意第三方 3D 户型 HTML 文件，AI 从代码中解析结构并迁移到 TP3D
 
 ### 技术栈
 
 | 层级 | 技术 |
 |---|---|
-| 前端 | 原生 JavaScript (ES Modules) |
+| 前端 | 原生 JavaScript（ES Modules），约 13,000 行代码 |
 | 3D 渲染 | Three.js |
 | 2D 渲染 | SVG（浏览器原生 Skia） |
 | 几何运算 | BufferGeometryUtils / three-bvh-csg / three-mesh-bvh |
 | 光照 | RGBELoader + Poly Haven HDRI 影棚光 |
 | 后处理 | SSAO（three.js postprocessing） |
 | 模型压缩 | DRACO（WASM 解码） |
+| AI 后端 | MiniMax（Claude 兼容 API） |
 | 本地服务 | Python 3 标准库 `http.server` |
 
 ### 快速开始
@@ -127,40 +149,36 @@ Floor plans are saved as `.tp3d.json` in the `json/` directory, containing compl
 #### 手动启动
 
 ```bash
-# 启动本地服务器（静态托管 + 户型文件 API）
 python _serve.py 8137
-
-# 浏览器打开
-# http://127.0.0.1:8137
+# 然后在浏览器打开 http://127.0.0.1:8137
 ```
 
-> 需要安装 Python 3 并加入系统 PATH。
+> 需要 Python 3 已加入系统 PATH。
 
 ### 目录结构
 
 ```
 editor/
 ├── index.html              # 主页面（UI + 样式，约 2500 行）
-├── main.js                 # 3D 场景核心逻辑
+├── main.js                 # 3D 场景 + AI 逻辑（约 13000 行）
 ├── render2d.js             # 2D SVG 平面图渲染器
-├── _serve.py              # 本地静态服务器 + 户型文件 API
+├── _serve.py              # 本地静态服务器 + API（AI 代理、文件 API）
 ├── 启动编辑器.bat           # Windows 一键启动脚本
 ├── json/                   # 户型数据文件（.tp3d.json）
 ├── libs/
 │   ├── three.module.js     # Three.js 核心库
-│   ├── items/              # 200+ 家具/设备 GLB 模型
+│   ├── items/              # 200+ 家具 GLB 模型
 │   ├── draco/             # DRACO WASM 解码器
 │   ├── postprocessing/     # SSAO、EffectComposer、ShaderPass 后处理
 │   ├── shaders/            # CopyShader、SSAOShader、OutputShader
 │   ├── environments/       # Poly Haven HDRI 影棚光照文件
-│   ├── textures/           # PBR 木地板纹理贴图
-│   └── ...                 # 其他 Three.js 插件与工具库
+│   └── textures/           # PBR 木地板纹理贴图
 └── utils/                  # 工具函数
 ```
 
 ### 户型文件格式
 
-户型以 `.tp3d.json` 格式保存于 `json/` 目录，包含完整的场景数据：墙体结构、门窗位置、家具摆放、材质设置及相机状态。
+`.tp3d.json` 格式保存于 `json/` 目录，包含完整场景数据：墙体几何、门窗、家具摆放、材质、主题及相机状态。
 
 ### 许可证
 
