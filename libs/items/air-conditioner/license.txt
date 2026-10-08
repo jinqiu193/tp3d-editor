@@ -1,0 +1,11 @@
+Model Information:
+* title:	Air conditioning
+* source:	https://sketchfab.com/3d-models/air-conditioning-45b7616790dc4c64b27d6bb0e60890c9
+* author:	Speed (https://sketchfab.com/Speeedd)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Air conditioning" (https://sketchfab.com/3d-models/air-conditioning-45b7616790dc4c64b27d6bb0e60890c9) by Speed (https://sketchfab.com/Speeedd) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

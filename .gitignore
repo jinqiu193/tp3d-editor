@@ -23,6 +23,19 @@ _serve.log
 .codeartsdoer/
 .vscode/
 .idea/
+.zcode/
+
+# Python 缓存
+__pycache__/
+*.pyc
+
+# 临时测试 / 工具目录
+_test_screenshots/
+_tools/
+
+# 第三方参考代码 / 压缩包
+openfloorplan-main.zip
+openfloorplan-main/
 
 # 系统文件
 .DS_Store

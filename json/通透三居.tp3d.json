@@ -1,0 +1,482 @@
+{
+  "tp3dVersion": 1,
+  "name": "通透三居",
+  "updatedAt": 1791354471169,
+  "doc": {
+    "name": "通透三居",
+    "wallH": 2.75,
+    "levels": [
+      {
+        "name": "1F",
+        "elev": 0
+      }
+    ],
+    "walls": [
+      {
+        "ax": 0,
+        "az": 0,
+        "bx": 13.2,
+        "bz": 0,
+        "th": 0.2,
+        "openings": [
+          {
+            "type": "window",
+            "t": 0.1,
+            "width": 1.5,
+            "height": 1.65,
+            "sill": 0.9,
+            "leafColor": "#61412f",
+            "leafTex": "wood"
+          },
+          {
+            "type": "window",
+            "t": 0.44,
+            "width": 1.4,
+            "height": 1.65,
+            "sill": 0.9,
+            "leafColor": "#61412f",
+            "leafTex": "wood"
+          },
+          {
+            "type": "window",
+            "t": 0.675,
+            "width": 1.3,
+            "height": 1.65,
+            "sill": 0.9,
+            "leafColor": "#61412f",
+            "leafTex": "wood"
+          },
+          {
+            "type": "window",
+            "t": 0.875,
+            "width": 1.15,
+            "height": 1.6,
+            "sill": 0.9,
+            "leafColor": "#61412f",
+            "leafTex": "wood"
+          }
+        ],
+        "lv": 0,
+        "wallBase": "#ded2bd"
+      },
+      {
+        "ax": 13.2,
+        "az": 0,
+        "bx": 13.2,
+        "bz": 9,
+        "th": 0.2,
+        "openings": [
+          {
+            "type": "window",
+            "t": 0.25,
+            "width": 1.2,
+            "height": 1.6,
+            "sill": 0.9,
+            "leafColor": "#61412f",
+            "leafTex": "wood"
+          },
+          {
+            "type": "window",
+            "t": 0.64,
+            "width": 1.3,
+            "height": 1.6,
+            "sill": 0.9,
+            "leafColor": "#61412f",
+            "leafTex": "wood"
+          }
+        ],
+        "lv": 0,
+        "wallBase": "#ded2bd"
+      },
+      {
+        "ax": 13.2,
+        "az": 9,
+        "bx": 0,
+        "bz": 9,
+        "th": 0.2,
+        "openings": [
+          {
+            "type": "window",
+            "t": 0.18,
+            "width": 2.2,
+            "height": 1.75,
+            "sill": 0.55,
+            "leafColor": "#61412f",
+            "leafTex": "wood"
+          },
+          {
+            "type": "window",
+            "t": 0.43,
+            "width": 2.1,
+            "height": 1.75,
+            "sill": 0.55,
+            "leafColor": "#61412f",
+            "leafTex": "wood"
+          },
+          {
+            "type": "door",
+            "t": 0.83,
+            "width": 1.3,
+            "height": 2.05,
+            "leafColor": "#684733",
+            "leafTex": "wood"
+          }
+        ],
+        "lv": 0,
+        "wallBase": "#ded2bd"
+      },
+      {
+        "ax": 0,
+        "az": 9,
+        "bx": 0,
+        "bz": 0,
+        "th": 0.2,
+        "openings": [
+          {
+            "type": "window",
+            "t": 0.4071696168334696,
+            "width": 1.4,
+            "height": 1.6,
+            "sill": 0.9,
+            "leafColor": "#61412f",
+            "leafTex": "wood"
+          }
+        ],
+        "lv": 0,
+        "wallBase": "#ded2bd"
+      },
+      {
+        "ax": 4,
+        "az": 0,
+        "bx": 4,
+        "bz": 4.3,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#ded2bd"
+      },
+      {
+        "ax": 7.5,
+        "az": 0,
+        "bx": 7.5,
+        "bz": 4.3,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#ded2bd"
+      },
+      {
+        "ax": 10.2,
+        "az": 0,
+        "bx": 10.2,
+        "bz": 4.3,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#ded2bd"
+      },
+      {
+        "ax": 11.9,
+        "az": 0,
+        "bx": 11.9,
+        "bz": 4.3,
+        "th": 0.12,
+        "openings": [],
+        "lv": 0,
+        "wallBase": "#ded2bd"
+      },
+      {
+        "ax": 0,
+        "az": 4.3,
+        "bx": 13.2,
+        "bz": 4.3,
+        "th": 0.12,
+        "openings": [
+          {
+            "type": "door",
+            "t": 0.15,
+            "width": 0.9,
+            "height": 2.05,
+            "leafColor": "#684733",
+            "leafTex": "wood"
+          },
+          {
+            "type": "door",
+            "t": 0.41892856902540926,
+            "width": 0.9,
+            "height": 2.05,
+            "leafColor": "#684733",
+            "leafTex": "wood"
+          },
+          {
+            "type": "door",
+            "t": 0.67,
+            "width": 0.9,
+            "height": 2.05,
+            "leafColor": "#684733",
+            "leafTex": "wood"
+          },
+          {
+            "type": "door",
+            "t": 0.84,
+            "width": 0.8,
+            "height": 2.05,
+            "leafColor": "#684733",
+            "leafTex": "wood"
+          }
+        ],
+        "lv": 0,
+        "wallBase": "#ded2bd"
+      },
+      {
+        "ax": 0,
+        "az": 7.5,
+        "bx": 8.5,
+        "bz": 7.5,
+        "th": 0.12,
+        "openings": [
+          {
+            "type": "door",
+            "t": 0.12,
+            "width": 0.95,
+            "height": 2.05,
+            "leafColor": "#684733",
+            "leafTex": "wood"
+          },
+          {
+            "type": "window",
+            "t": 0.36,
+            "width": 1.5,
+            "height": 2.2,
+            "sill": 0.15,
+            "leafColor": "#61412f",
+            "leafTex": "wood"
+          },
+          {
+            "type": "window",
+            "t": 0.62,
+            "width": 1.6,
+            "height": 2.2,
+            "sill": 0.15,
+            "leafColor": "#61412f",
+            "leafTex": "wood"
+          },
+          {
+            "type": "window",
+            "t": 0.86,
+            "width": 1.5,
+            "height": 2.2,
+            "sill": 0.15,
+            "leafColor": "#61412f",
+            "leafTex": "wood"
+          }
+        ],
+        "lv": 0,
+        "wallBase": "#ded2bd"
+      }
+    ],
+    "floors": [
+      {
+        "x1": 0.15000000000000002,
+        "z1": 0,
+        "x2": 13.35,
+        "z2": 9,
+        "th": 0.15,
+        "color": "#76523a",
+        "lv": 0,
+        "tex": "wood-floor-040"
+      },
+      {
+        "x1": 0.12,
+        "z1": 7.61,
+        "x2": 8.38,
+        "z2": 8.88,
+        "th": 0.16,
+        "color": "#76523a",
+        "lv": 0,
+        "tex": "wood-floor-040"
+      }
+    ],
+    "furniture": [
+      {
+        "type": "nightstand",
+        "x": 2.73,
+        "z": 0.48,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "wardrobe",
+        "x": 2.95,
+        "z": 0.5,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "bed",
+        "x": 5.25,
+        "z": 1.2,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "nightstand",
+        "x": 4.18,
+        "z": 0.48,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "wardrobe",
+        "x": 6.55,
+        "z": 0.5,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "bed1",
+        "x": 8.05,
+        "z": 1.28,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "nightstand",
+        "x": 7.15,
+        "z": 0.48,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "wardrobe",
+        "x": 9.28,
+        "z": 0.5,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "desk",
+        "x": 11.05,
+        "z": 2.75,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "shelf",
+        "x": 11.05,
+        "z": 0.42,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "shoeCabinet",
+        "x": 12.55,
+        "z": 0.42,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "wardrobeOpen",
+        "x": 12.58,
+        "z": 1.7,
+        "rot": -1.5708,
+        "lv": 0
+      },
+      {
+        "type": "shoeRack",
+        "x": 12.55,
+        "z": 3.25,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "sofa",
+        "x": 2.75,
+        "z": 5.15,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "tea",
+        "x": 2.75,
+        "z": 6.05,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "tvStand",
+        "x": 2.75,
+        "z": 6.85,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "tvFlat",
+        "x": 2.75,
+        "z": 6.65,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "lrChair",
+        "x": 5.35,
+        "z": 5.55,
+        "rot": -1.5708,
+        "lv": 0
+      },
+      {
+        "type": "dining",
+        "x": 9.7,
+        "z": 5.55,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "kitchen",
+        "x": 12.55,
+        "z": 5.15,
+        "rot": -1.5708,
+        "lv": 0
+      },
+      {
+        "type": "fridge",
+        "x": 11.05,
+        "z": 5.05,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "stove",
+        "x": 12.4,
+        "z": 7.1000000000000005,
+        "rot": -1.5708,
+        "lv": 0
+      },
+      {
+        "type": "dryingRack",
+        "x": 6.7,
+        "z": 8.15,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "ceilLamp",
+        "x": 2.75,
+        "z": 5.75,
+        "rot": 0,
+        "lv": 0
+      },
+      {
+        "type": "circularCeilingLight",
+        "x": 9.7,
+        "z": 5.55,
+        "rot": 0,
+        "lv": 0
+      }
+    ],
+    "stairs": [],
+    "hidden": {},
+    "groups": [],
+    "assets": []
+  }
+}

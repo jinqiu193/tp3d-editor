@@ -1,0 +1,11 @@
+Model Information:
+* title:	Hospital Sharps Container
+* source:	https://sketchfab.com/3d-models/hospital-sharps-container-1b653c90ccd048d280a9f53a1577ca61
+* author:	cig3d (https://sketchfab.com/cig3d)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Hospital Sharps Container" (https://sketchfab.com/3d-models/hospital-sharps-container-1b653c90ccd048d280a9f53a1577ca61) by cig3d (https://sketchfab.com/cig3d) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

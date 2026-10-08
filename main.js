@@ -1471,6 +1471,7 @@ globalThis.snapFurn = snapFurn;       // 暴露吸附函数给 e2e
 }
 globalThis.__exposeE2E = _exposeE2E;
 let undoStack = [], redoStack = [];
+let undoFurnStack = [], redoFurnStack = [];
 let clipboard = null;                 // 复制粘贴用的源对象引用
 let gridSnap = true;
 const SNAP = 0.05;
@@ -2413,11 +2414,32 @@ function stepRot15(cur, dir) {
 }
 
 // 撤销 / 重做
-function pushUndo() {
+// pushUndo 可选地接受一个 FURN 变更描述{furnRestore: {key: entry}}:
+//   - 写入时记录被删/被改的 FURN 条目,undo 时把它们放回,redo 时再删一次。
+//   - 因为 FURN 顶层不可 JSON 序列化(build 是函数),需要单独追踪。
+function pushUndo(furnDelta) {
   undoStack.push(JSON.stringify(doc));
-  if (undoStack.length > 60) undoStack.shift();
+  undoFurnStack.push(furnDelta || null);
+  if (undoStack.length > 60) { undoStack.shift(); undoFurnStack.shift(); }
   redoStack.length = 0;
+  redoFurnStack.length = 0;
   refreshUndoTip();
+}
+function _applyFurnDelta(delta, dir) {
+  if (!delta) return;
+  const restore = delta.furnRestore || {};
+  for (const k in restore) {
+    if (dir === 'undo') FURN[k] = restore[k];
+    else delete FURN[k];
+  }
+  // 反向:undo 时把 furnDelete 加回,redo 时删掉
+  for (const k of (delta.furnDelete || [])) {
+    if (dir === 'undo') {
+      // 重新创建;只有当此 key 原本就来自调用方记录的 restore 时才可行
+    } else {
+      delete FURN[k];
+    }
+  }
 }
 // 键盘微移（方向键）：选中家具 / 墙端点 / 门窗 / 地面都生效
 // Shift ×10。每按一次都 pushUndo（按一下回退一下，符合直觉）。
@@ -2599,13 +2621,22 @@ function syncUndoButtons() {
 function undo() {
   if (!undoStack.length) return flash('没有可撤销的操作', 'warn');
   redoStack.push(JSON.stringify(doc));
+  redoFurnStack.push(undoFurnStack[undoFurnStack.length - 1]);
+  const delta = undoFurnStack.pop();
   doc = JSON.parse(undoStack.pop()); normDoc();
+  _applyFurnDelta(delta, 'undo');
+  if (delta && delta.furnRestore) {
+    for (const k in delta.furnRestore) { if (_glbCache && _glbCache.delete) _glbCache.delete(k); }
+  }
   sel = null; rebuild(); refreshProps(); flash('已撤销', 'success'); syncUndoButtons();
 }
 function redo() {
   if (!redoStack.length) return flash('没有可重做的操作', 'warn');
   undoStack.push(JSON.stringify(doc));
+  undoFurnStack.push(redoFurnStack[redoFurnStack.length - 1]);
+  const delta = redoFurnStack.pop();
   doc = JSON.parse(redoStack.pop()); normDoc();
+  _applyFurnDelta(delta, 'redo');
   sel = null; rebuild(); refreshProps(); flash('已重做', 'success'); syncUndoButtons();
 }
 
@@ -3615,7 +3646,7 @@ ${jsCode}
   bed,bed1,wardrobe,nightstand,desk,shelf,sofa,tea,dining,toilet,basin,fridge,diningChair,officeChair,
   officeTable,glbDesk,couchMed,couchSm,lounge,meetingTable,coffeeTable,table,closet,dresser,tvFlat,
   tvStand,computer,glbSofa,sofaBlack,sofaRow3,stool,coatRack,waitingChair,cabinetWhite,woodCabinet,
-  woodPcDesk,woodBedside,bedHeadScreen,bedsideScreen,glbShelf,books,bookshelf,picture,rectangularCarpet,
+  woodPcDesk,woodBedside,glbShelf,books,bookshelf,picture,rectangularCarpet,
   rectangularMirror,roundCarpet,roundMirror,wallArt06,wineBottle,laundryBag,firTree,bush,cactus,column,
   fence,hedge,highFence,hydrant,indoorPlant,lowFence,mediumFence,palm,parkingSpot,pillar,pottedWhite,
   smallIndoorPlant,tree,ceilFan,ceilLamp,ceilingLight,floorLamp,tableLamp,stove,microwave,washer,kitchen,
@@ -3824,6 +3855,7 @@ function deleteCustomAsset(id) {
         }));
         rebuild(); refreshProps(); markUnsaved(true);
         toast(`已删除「${meta.name}」`, 'success');
+        if (typeof renderModelsPanel === 'function' && _panelTabs && _panelTabs.active === 'models') renderModelsPanel();
       } },
     ]);
 }
@@ -4562,16 +4594,6 @@ function fWheelchair() {
     addLocal(g, box(0.04, 0.3, 0.4), M.dark, sx * 0.25, 0.65, 0, false);
   return g;
 }
-function fIVStand() {
-  const g = new THREE.Group();
-  addLocal(g, new THREE.CylinderGeometry(0.25, 0.25, 0.04, 16), M.dark, 0, 0.02, 0);
-  addLocal(g, new THREE.CylinderGeometry(0.03, 0.03, 1.8, 8), M.metal, 0, 0.92, 0);
-  addLocal(g, new THREE.CylinderGeometry(0.15, 0.15, 0.02, 12), M.metal, 0, 1.85, 0, false);
-  for (const sx of [-1, 1])
-    addLocal(g, box(0.02, 0.1, 0.02), M.metal, sx * 0.1, 1.9, 0, false);
-  addLocal(g, rbox(0.12, 0.25, 0.06, 0.01), M.white, 0, 1.7, 0, false);
-  return g;
-}
 function fHospitalBed() {
   const g = new THREE.Group();
   addLocal(g, rbox(1.0, 0.3, 2.1, 0.02), M.gray, 0, 0.45, 0);
@@ -4851,25 +4873,6 @@ function fAnesthesiaMachine() {
   // 底部脚轮
   for (const sx of [-0.24, 0.24]) for (const sz of [-0.2, 0.2])
     addLocal(g, new THREE.CylinderGeometry(0.04, 0.04, 0.03, 10), M.dark, sx, 0.03, sz);
-  return g;
-}
-function fInfusionPump() {
-  const g = new THREE.Group();
-  // 泵体
-  addLocal(g, rbox(0.32, 0.42, 0.34, 0.02), M.white, 0, 0.35, 0);
-  // 显示屏
-  addLocal(g, box(0.22, 0.14, 0.03), M.dark, 0, 0.4, 0.18);
-  addLocal(g, box(0.16, 0.08, 0.02), M.medGreen, 0, 0.4, 0.19, false);
-  // 门锁扣
-  addLocal(g, box(0.04, 0.3, 0.04), M.gray, 0.12, 0.42, 0.18);
-  // 输液管 + 输液瓶
-  addLocal(g, new THREE.CylinderGeometry(0.012, 0.012, 0.5, 6), M.dark, 0, 0.75, 0.1);
-  addLocal(g, new THREE.CylinderGeometry(0.06, 0.05, 0.18, 12), M.glass, 0, 0.9, 0.1);
-  addLocal(g, new THREE.CylinderGeometry(0.02, 0.02, 0.08, 8), M.gray, 0, 1.0, 0.1);
-  // 顶部挂钩
-  addLocal(g, new THREE.TorusGeometry(0.05, 0.015, 6, 12), M.metal, 0, 1.05, 0.1);
-  // 底脚
-  for (const sx of [-0.12, 0.12]) addLocal(g, new THREE.CylinderGeometry(0.03, 0.03, 0.03, 8), M.dark, sx, 0.02, 0.12);
   return g;
 }
 function fFirstAidKit() {
@@ -5255,10 +5258,8 @@ const FURN = {
 
   // ── fac/ 70 个医疗/办公/标识 专用模型（中文源 → ASCII slug）──
   medPda                : { name: '医疗 PDA', icon: '📱', cat: 'medical', w: 0.077, d: 0.02, h: 0.163, file: 'pda-handheld', build: glbBuild('pda-handheld') },
-  medCallBtn            : { name: '一键呼叫按钮', icon: '🆘', cat: 'medical', w: 0.086, d: 0.2, h: 0.016, file: 'call-button', build: glbBuild('call-button') },
   glbIronStair          : { name: '铁扶手楼梯', icon: '🪜', cat: 'stairs', w: 7.945, d: 3.65, h: 3.753, file: 'iron-railing-stair', build: glbBuild('iron-railing-stair') },
   meetingTable          : { name: '会议桌', icon: '🗄', cat: 'furn', w: 5.152, d: 2.181, h: 0.986, file: 'meeting-table', build: glbBuild('meeting-table') },
-  medTempTag            : { name: '体温标签', icon: '🌡', cat: 'medical', w: 0.037, d: 0.009, h: 0.037, file: 'temp-tag-qr', build: glbBuild('temp-tag-qr') },
   medFridge             : { name: '医用冰箱', icon: '🧊', cat: 'kitchen', w: 1.071, d: 1.342, h: 1.815, file: 'fridge-1', build: glbBuild('fridge-1') },
   medOutflowSens        : { name: '出液传感器', icon: '💧', cat: 'medical', w: 0.072, d: 0.025, h: 0.066, file: 'outflow-sensor', build: glbBuild('outflow-sensor') },
   officeChairBlk        : { name: '办公椅(黑)', icon: '🪑', cat: 'furn', w: 0.604, d: 0.63, h: 0.801, file: 'office-chair-black', build: glbBuild('office-chair-black') },
@@ -5271,33 +5272,21 @@ const FURN = {
   stoolGreen            : { name: '圆凳(绿)', icon: '🪑', cat: 'furn', w: 0.579, d: 0.556, h: 0.849, file: 'stool-green', build: glbBuild('stool-green') },
   wallStruct            : { name: '墙体结构', icon: '🧱', cat: 'other', w: 0.557, d: 0.203, h: 0.03, file: 'wall-structure', scale: 0.01, build: glbBuild('wall-structure') },
   marbleTeaTable        : { name: '大理石茶桌', icon: '☕', cat: 'furn', w: 0.835, d: 2.026, h: 0.355, file: 'marble-tea-table', build: glbBuild('marble-tea-table') },
-  medBabyTag            : { name: '婴儿标签', icon: '👶', cat: 'medical', w: 0.027, d: 0.012, h: 0.033, file: 'baby-tag', build: glbBuild('baby-tag') },
   navSplitLR            : { name: '左右分流标识', icon: '↔', cat: 'other', w: 0.424, d: 0.019, h: 0.184, file: 'split-lr', build: glbBuild('split-lr') },
-  bedHeadScreen         : { name: '床头屏', icon: '📺', cat: 'furn', w: 0.388, d: 0.046, h: 0.154, file: 'bed-head-screen', build: glbBuild('bed-head-screen') },
-  bedsideScreen         : { name: '床旁屏', icon: '📺', cat: 'furn', w: 0.38, d: 0.03, h: 0.266, file: 'bedside-screen', build: glbBuild('bedside-screen') },
   greenPillow           : { name: '绿色枕头', icon: '🛏', cat: 'bed', w: 1.986, d: 0.764, h: 0.497, file: 'green-pillow', build: glbBuild('green-pillow') },
   medEcg                : { name: '心电监护仪', icon: '💓', cat: 'medical', w: 0.454, d: 0.256, h: 0.414, file: 'ecg-monitor', build: glbBuild('ecg-monitor') },
   medSurgTbl            : { name: '手术台', icon: '🛏', cat: 'medical', w: 2.099, d: 1.028, h: 1.034, file: 'surgery-table', build: glbBuild('surgery-table') },
   medSurgArm            : { name: '手术机械臂', icon: '🤖', cat: 'medical', w: 1.697, d: 1.338, h: 2.412, file: 'surgery-arm', build: glbBuild('surgery-arm') },
   medSurgArmLight       : { name: '手术机械臂灯', icon: '💡', cat: 'medical', w: 2.573, d: 3.16, h: 2.564, file: 'surgery-arm-light', build: glbBuild('surgery-arm-light') },
   medSurgLight          : { name: '手术灯', icon: '💡', cat: 'medical', w: 2.421, d: 2.7, h: 1.962, file: 'surgery-light', build: glbBuild('surgery-light') },
-  nurseStation          : { name: '护士站', icon: '🏥', cat: 'furn', w: 1.856, d: 3.703, h: 1.127, file: 'nurse-station', build: glbBuild('nurse-station') },
-  nurseStationPC        : { name: '护士站主机', icon: '🖥', cat: 'furn', w: 0.433, d: 0.231, h: 0.072, file: 'nurse-station-pc', build: glbBuild('nurse-station-pc') },
   medWashSens           : { name: '按压洗手传感器', icon: '🧼', cat: 'medical', w: 0.064, d: 0.08, h: 0.039, file: 'press-wash-sensor', build: glbBuild('press-wash-sensor') },
-  medFallRadar          : { name: '摔倒监测雷达', icon: '📡', cat: 'medical', w: 0.102, d: 0.102, h: 0.043, file: 'fall-radar', build: glbBuild('fall-radar') },
   cabinetWhite          : { name: '文件柜(白)', icon: '🗄', cat: 'furn', w: 1.84, d: 0.4, h: 2, file: 'filing-cabinet-white', build: glbBuild('filing-cabinet-white') },
-  screenOnco            : { name: '昂科门口屏', icon: '📺', cat: 'media', w: 0.226, d: 0.028, h: 0.424, file: 'onco-door-screen', build: glbBuild('onco-door-screen') },
-  medPullTag            : { name: '易拉扣标签', icon: '🏷', cat: 'medical', w: 0.032, d: 0.024, h: 0.034, file: 'pull-tab-tag', build: glbBuild('pull-tab-tag') },
-  medSmartMattress      : { name: '智能床垫', icon: '🛏', cat: 'bed', w: 0.29, d: 1.105, h: 0.024, file: 'smart-mattress', build: glbBuild('smart-mattress') },
-  medWristTag           : { name: '智能腕式标签', icon: '⌚', cat: 'medical', w: 0.024, d: 0.104, h: 0.146, file: 'wristband-tag', build: glbBuild('wristband-tag') },
   woodCabinet1          : { name: '木纹单柜', icon: '🪑', cat: 'furn', w: 1.145, d: 0.4, h: 1.2, file: 'wood-single-cabinet', build: glbBuild('wood-single-cabinet') },
   woodBedside           : { name: '木纹床头柜', icon: '🪑', cat: 'bed', w: 0.328, d: 0.361, h: 0.376, file: 'wood-bedside', build: glbBuild('wood-bedside') },
   woodCabinet           : { name: '木纹柜', icon: '🪑', cat: 'furn', w: 0.705, d: 0.37, h: 1.146, file: 'wood-cabinet', build: glbBuild('wood-cabinet') },
   woodPcDesk            : { name: '木纹电脑桌', icon: '🖥', cat: 'furn', w: 1.915, d: 0.6, h: 1.099, file: 'wood-pc-desk', build: glbBuild('wood-pc-desk') },
   woodCabSet            : { name: '木纹组柜', icon: '🪑', cat: 'furn', w: 3, d: 0.45, h: 0.814, file: 'wood-cabinet-set', build: glbBuild('wood-cabinet-set') },
   glbStair              : { name: '楼梯', icon: '🪜', cat: 'stairs', w: 3.525, d: 7.048, h: 3.753, file: 'stair', build: glbBuild('stair') },
-  medMomTag             : { name: '母亲标签', icon: '👩', cat: 'medical', w: 0.03, d: 0.013, h: 0.042, file: 'mom-tag', build: glbBuild('mom-tag') },
-  medMomBabyTag         : { name: '母婴标签', icon: '👶', cat: 'medical', w: 0.03, d: 0.013, h: 0.042, file: 'mom-baby-tag', build: glbBuild('mom-baby-tag') },
   medTempHumid          : { name: '温湿度传感器', icon: '🌡', cat: 'medical', w: 0.065, d: 0.039, h: 0.117, file: 'temp-humid-sensor', build: glbBuild('temp-humid-sensor') },
   medEnvMon             : { name: '环境监测终端', icon: '🌡', cat: 'medical', w: 0.112, d: 0.112, h: 0.033, file: 'env-monitor', build: glbBuild('env-monitor') },
   pcBlack               : { name: '黑色电脑', icon: '💻', cat: 'media', w: 1.14, d: 0.651, h: 0.668, file: 'pc-black', build: glbBuild('pc-black') },
@@ -5308,18 +5297,8 @@ const FURN = {
   medGateway            : { name: '监护网关', icon: '📡', cat: 'medical', w: 0.065, d: 0.065, h: 0.021, file: 'monitor-gateway', build: glbBuild('monitor-gateway') },
   waitingChair          : { name: '等候区座椅', icon: '🪑', cat: 'furn', w: 1.501, d: 0.537, h: 0.581, file: 'waiting-chair', build: glbBuild('waiting-chair') },
   sofaRow3              : { name: '联排沙发(3人)', icon: '🛋', cat: 'furn', w: 0.837, d: 2.044, h: 0.714, file: 'sofa-row-3', build: glbBuild('sofa-row-3') },
-  medChestTag           : { name: '胸卡标签', icon: '🏷', cat: 'medical', w: 0.055, d: 0.005, h: 0.086, file: 'chest-tag', build: glbBuild('chest-tag') },
   showerBath            : { name: '花洒浴室', icon: '🚿', cat: 'bath', w: 0.819, d: 0.464, h: 1.733, file: 'shower-bath', build: glbBuild('shower-bath') },
-  medBleTag             : { name: '蓝牙定位标签', icon: '📡', cat: 'medical', w: 0.025, d: 0.012, h: 0.034, file: 'ble-tag', build: glbBuild('ble-tag') },
-  medAssetTag           : { name: '资产定位标签', icon: '🏷', cat: 'medical', w: 0.04, d: 0.011, h: 0.04, file: 'asset-tag', build: glbBuild('asset-tag') },
-  medAssetStateTag      : { name: '资产状态标签', icon: '🏷', cat: 'medical', w: 0.05, d: 0.05, h: 0.015, file: 'asset-state-tag', build: glbBuild('asset-state-tag') },
-  screenCorridor        : { name: '走廊屏', icon: '📺', cat: 'media', w: 0.724, d: 0.181, h: 0.232, file: 'corridor-screen', build: glbBuild('corridor-screen') },
-  medCryoTag            : { name: '超低温标签', icon: '🥶', cat: 'medical', w: 0.067, d: 0.039, h: 0.089, file: 'cryo-tag', build: glbBuild('cryo-tag') },
   squatToilet           : { name: '蹲便器', icon: '🚽', cat: 'bath', w: 0.375, d: 0.488, h: 0.028, file: 'squat-toilet', build: glbBuild('squat-toilet') },
-  medIvPole             : { name: '输液杆', icon: '💉', cat: 'medical', w: 0.587, d: 0.583, h: 2.239, file: 'iv-pole', build: glbBuild('iv-pole') },
-  medIvMonitor          : { name: '输液监视器', icon: '💉', cat: 'medical', w: 0.12, d: 0.036, h: 0.153, file: 'iv-monitor', build: glbBuild('iv-monitor') },
-  medIvEmpty            : { name: '输液空管检测器', icon: '💉', cat: 'medical', w: 0.06, d: 0.077, h: 0.027, file: 'iv-empty-detector', build: glbBuild('iv-empty-detector') },
-  screenDoor            : { name: '门口屏', icon: '📺', cat: 'media', w: 0.226, d: 0.028, h: 0.424, file: 'door-screen', build: glbBuild('door-screen') },
   medTamperBand         : { name: '防拆腕带', icon: '⌚', cat: 'medical', w: 0.036, d: 0.127, h: 0.202, file: 'tamper-wristband', build: glbBuild('tamper-wristband') },
   urinalCeramic         : { name: '陶瓷小便池', icon: '🚽', cat: 'bath', w: 0.265, d: 0.294, h: 0.916, file: 'urinal-ceramic', build: glbBuild('urinal-ceramic') },
   toiletLid             : { name: '马桶盖', icon: '🚽', cat: 'bath', w: 0.469, d: 0.924, h: 1.198, file: 'toilet-lid', build: glbBuild('toilet-lid') },
@@ -5359,7 +5338,6 @@ const FURN = {
   triageDesk     : { cat: 'medical', name: '分诊台',         icon: '🏥', w: 2.0,  d: 0.6,  build: fTriageDesk },
   medicineCabinet: { cat: 'medical', name: '药柜',           icon: '💊', w: 1.5,  d: 0.4,  build: fMedicineCabinet },
   wheelchair     : { cat: 'medical', name: '轮椅',           icon: '♿', w: 0.6,  d: 0.7,  build: fWheelchair },
-  ivStand        : { cat: 'medical', name: '输液架',         icon: '💉', w: 0.5,  d: 0.5,  build: fIVStand },
   hospitalBed    : { cat: 'medical', name: '病床',           icon: '🛏', w: 1.0,  d: 2.1,  build: fHospitalBed },
   stretcher      : { cat: 'medical', name: '担架',           icon: '🛏', w: 0.7,  d: 1.9,  build: fStretcher },
   medCart        : { cat: 'medical', name: '医疗推车',       icon: '🚑', w: 0.6,  d: 0.4,  build: fMedCart },
@@ -5379,7 +5357,6 @@ const FURN = {
   // ── 治疗 / 急救设备 ──
   defibrillator  : { cat: 'medical', name: '除颤仪',         icon: '⚡', w: 0.5,  d: 0.3,  build: fDefibrillator },
   anesthesiaMch  : { cat: 'medical', name: '麻醉机',         icon: '💨', w: 0.6,  d: 0.5,  build: fAnesthesiaMachine },
-  infusionPump   : { cat: 'medical', name: '输液泵',         icon: '💉', w: 0.35, d: 0.35, build: fInfusionPump },
   firstAidKit    : { cat: 'medical', name: '急救箱',         icon: '🆘', w: 0.45, d: 0.3,  build: fFirstAidKit },
   oxygenCart     : { cat: 'medical', name: '氧气瓶车',       icon: '🎈', w: 0.6,  d: 0.4,  build: fOxygenTankCart },
 
@@ -5413,11 +5390,11 @@ const NATIVE_INSTANCED_OK = new Set([
   'wardrobeOpen', 'dresserMirror',
   'workstation', 'receptionDesk', 'displayCabinet', 'meetingSet', 'officePartition',
   'filingCabinet', 'whiteboard', 'printerStand',
-  'signBoard', 'triageDesk', 'medicineCabinet', 'wheelchair', 'ivStand',
+  'signBoard', 'triageDesk', 'medicineCabinet', 'wheelchair',
   'hospitalBed', 'stretcher', 'medCart',
   'examBed', 'infantCrib', 'deliveryBed', 'icuBed', 'companionBed',
   'ctScanner', 'xrayMachine', 'ultrasound',
-  'defibrillator', 'anesthesiaMch', 'infusionPump', 'firstAidKit', 'oxygenCart',
+  'defibrillator', 'anesthesiaMch', 'firstAidKit', 'oxygenCart',
   'microscope', 'centrifuge', 'vitalsCart',
   'walker', 'mobileSurgLamp', 'chartCabinet', 'sanitizerStand'
   // 'shelf' excluded — fShelf 内部 Math.random() 书本数不固定,geometry 每帧都变
@@ -9512,6 +9489,7 @@ const _panelTabs = (() => {
     files:     document.getElementById('filesPanel'),
     theme:     document.getElementById('themePanel'),
     inspector: document.getElementById('inspector'),
+    models:    document.getElementById('modelsPanel'),
   };
   // 注册到 ui 的 surface id 跟 panel id 同名(REG 里有 'outlinePanel/filesPanel/themePanel',inspector 也按此推)
   const regIds = {
@@ -9519,6 +9497,7 @@ const _panelTabs = (() => {
     files:     'filesPanel',
     theme:     'themePanel',
     inspector: 'inspector',
+    models:    'modelsPanel',
   };
   let active = 'outline';    // 当前手动选中的 tab
   let followSelection = false; // true 时,选中对象会让 inspector 强制激活并压制 active
@@ -9542,6 +9521,7 @@ const _panelTabs = (() => {
       if (name === 'outline' && typeof outlineTree !== 'undefined' && outlineTree.render) outlineTree.render();
       if (name === 'files'   && typeof renderFilesPanel === 'function') renderFilesPanel();
       if (name === 'theme'   && typeof renderThemePanel === 'function') renderThemePanel();
+      if (name === 'models'  && typeof renderModelsPanel === 'function') renderModelsPanel();
     }
     // ui 栈同步:push 用 ui 模块里 REG 注册过的 surface id,这样 Esc -> close(id) 才能命中
     if (typeof __ui !== 'undefined') {
@@ -9549,7 +9529,7 @@ const _panelTabs = (() => {
       if (panels[name]) __ui._push(regIds[name]);
     }
     if (!silent) {
-      const labels = { outline: '大纲', files: '文件工作区', theme: '材质', inspector: '属性' };
+      const labels = { outline: '大纲', files: '文件工作区', theme: '材质', inspector: '属性', models: '模型管理' };
       flash(labels[name] + '已打开', 'success');
     }
   }
@@ -9564,7 +9544,7 @@ const _panelTabs = (() => {
     followSelection = false;
     if (typeof __ui !== 'undefined') __ui._pop(regIds[name]);
     if (!silent) {
-      const labels = { outline: '大纲', files: '文件工作区', theme: '材质', inspector: '属性' };
+      const labels = { outline: '大纲', files: '文件工作区', theme: '材质', inspector: '属性', models: '模型管理' };
       flash(labels[name] + '已关闭');
     }
   }
@@ -9609,6 +9589,7 @@ __registerRailSidePanel('outline', () => _panelTabs.hide('outline', { silent: tr
 __registerRailSidePanel('files',   () => _panelTabs.hide('files',   { silent: true }));
 __registerRailSidePanel('theme',   () => _panelTabs.hide('theme',   { silent: true }));
 __registerRailSidePanel('inspector', () => _panelTabs.hide('inspector', { silent: true }));
+__registerRailSidePanel('models',  () => _panelTabs.hide('models',  { silent: true }));
 globalThis.__outlineToggle = _wrapToggle('outline');
 globalThis.__filesToggle = _wrapToggle('files');
 globalThis.__themeToggle = _wrapToggle('theme');
@@ -10284,8 +10265,8 @@ const ui = (() => {
     close: () => { onb.hidden = true; },
   });
 
-  // 大纲/文件/主题 三个 rail 侧栏
-  ['outlinePanel', 'filesPanel', 'themePanel'].forEach(id => {
+  // 大纲/文件/主题/模型 四个 rail 侧栏(都通过 _panelTabs 互斥,共享注册模板)
+  ['outlinePanel', 'filesPanel', 'themePanel', 'modelsPanel'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     ui.register(id, {
@@ -10296,9 +10277,8 @@ const ui = (() => {
     const btn = document.querySelector(`[data-ui-trigger="${id}"]`);
     if (!btn) {
       // 自动发现:btnOutline/btnFiles/btnTheme 都是对应 panel 的触发器
-      const btnId = id === 'outlinePanel' ? 'btnOutline' : id === 'filesPanel' ? 'btnFiles' : 'btnTheme';
-      const b = document.getElementById(btnId);
-      if (b) b.setAttribute('data-ui-trigger', id);
+      const btnId = id === 'outlinePanel' ? 'btnOutline' : id === 'filesPanel' ? 'btnFiles' : id === 'themePanel' ? 'btnTheme' : null;
+      if (btnId) { const b = document.getElementById(btnId); if (b) b.setAttribute('data-ui-trigger', id); }
     }
   });
 })();
@@ -11379,6 +11359,131 @@ function renderFilesPanel() {
   }
 }
 
+// ── 模型管理面板(第 5 个 panel tab) ──
+// 浏览当前文档可用的全部模型,提供软删(仅从 FURN 移除)/ 硬删(同时清磁盘 GLB)两种操作。
+// 自定义模型(导入的)直接复用 deleteCustomAsset,已含元数据/IndexedDB/磁盘/实例 4 步清理。
+let _modelsSearch = '';
+function renderModelsPanel() {
+  const el = document.getElementById('modelsBody');
+  if (!el) return;
+  const q = (_modelsSearch || '').toLowerCase().trim();
+  const all = Object.entries(FURN);
+  const placed = {};
+  (doc.furniture || []).forEach(f => { placed[f.type] = (placed[f.type] || 0) + 1; });
+  const nBuilt  = all.filter(([, d]) => !d.custom).length;
+  const nCustom = all.filter(([, d]) =>  d.custom).length;
+  const groups = {};
+  for (const [k, d] of all) {
+    if (q && !d.name.toLowerCase().includes(q) && !k.toLowerCase().includes(q)) continue;
+    const c = d.cat || 'other';
+    (groups[c] = groups[c] || []).push([k, d]);
+  }
+  let total = 0;
+  let html = `
+    <input id="modelsSearch" class="fsearch" placeholder="🔍 搜索模型(中文 / 英文 key)…" value="${(_modelsSearch || '').replace(/"/g, '&quot;')}">
+    <div class="note" style="margin:6px 0">内置 ${nBuilt} · 自定义 ${nCustom} · 共 ${all.length}</div>`;
+  for (const cat of (typeof FURN_CAT_ORDER !== 'undefined' ? FURN_CAT_ORDER : [])) {
+    const items = groups[cat];
+    if (!items || !items.length) continue;
+    total += items.length;
+    html += `<details class="fcat" open><summary>${(FURN_CAT_NAMES && FURN_CAT_NAMES[cat]) || cat}<span class="cnt">${items.length}</span></summary><div class="fgrid">`;
+    items.forEach(([k, d]) => {
+      const n = placed[k] || 0;
+      const safeName = (d.name || k).replace(/[<>&"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]));
+      const isCustom = !!d.custom;
+      html += `<div class="fmodelRow${n ? ' inUse' : ''}" data-k="${k}">
+        <span class="em">${d.icon || ICON.cube}</span>
+        <span class="fname" title="${safeName} (key: ${k})">${safeName}</span>
+        <span class="fcat-badge">${(FURN_CAT_NAMES && FURN_CAT_NAMES[d.cat]) || d.cat || '其他'}</span>
+        ${n ? `<span class="cnt" title="已放置">×${n}</span>` : ''}
+        <span class="fmodelBtns">${isCustom
+          ? `<button class="btn sm danger" data-act="delCustom" data-k="${k}" data-id="${d.custom}" title="完整删除自定义模型(元数据 + 字节 + 磁盘 + 实例)">删除</button>`
+          : `<button class="btn sm" data-act="hide" data-k="${k}" title="从当前文档隐藏,GLB 文件保留在磁盘">隐藏</button>
+             <button class="btn sm danger" data-act="del" data-k="${k}" title="从库移除并删除 GLB 文件">${d.file ? '删 GLB' : '删除'}</button>`}</span>
+      </div>`;
+    });
+    html += `</div></details>`;
+  }
+  if (!total) html += `<div class="note">无匹配模型</div>`;
+  el.innerHTML = html;
+  const si = document.getElementById('modelsSearch');
+  if (si) {
+    let comp = false;
+    si.addEventListener('compositionstart', () => { comp = true; });
+    si.addEventListener('compositionend', e => { comp = false; _modelsSearch = e.target.value; renderModelsPanel(); });
+    si.oninput = e => { if (comp) return; _modelsSearch = e.target.value; renderModelsPanel(); };
+  }
+  el.querySelectorAll('[data-act]').forEach(btn => {
+    btn.onclick = (ev) => {
+      ev.stopPropagation();
+      const act = btn.dataset.act, k = btn.dataset.k, id = btn.dataset.id;
+      if (act === 'delCustom' && id) return deleteCustomAsset(id);
+      if (act === 'hide') return confirmHideBuiltIn(k);
+      if (act === 'del')  return confirmDeleteBuiltIn(k, true);
+    };
+  });
+}
+
+function confirmHideBuiltIn(key) {
+  const d = FURN[key];
+  if (!d) return;
+  const used = (doc.furniture || []).filter(f => f.type === key).length;
+  const fileHint = d.file
+    ? `<br>GLB 文件 <code>libs/items/${d.file}/model.glb</code> 仍保留在磁盘上。`
+    : '<br>该模型是参数化生成,无磁盘文件。';
+  tpDialog('隐藏内置模型', `
+    <div class="note">将从当前文档移除「${d.name}」(key: <code>${key}</code>)${used ? `,已放置的 ${used} 件实例会从场景中消失` : ''}。${fileHint}<br>可通过修改源码重新引入。</div>`,
+    [
+      { t: '取消' },
+      { t: '隐藏', fn() { doHideBuiltIn(key); } },
+    ]);
+}
+function doHideBuiltIn(key) {
+  const d = FURN[key];
+  if (!d) return;
+  pushUndo({ furnRestore: { [key]: d } });
+  doc.furniture = (doc.furniture || []).filter(f => f.type !== key);
+  delete FURN[key];
+  if (d.file) _glbCache.delete(key);
+  if (furnType === key) furnType = null;
+  rebuild(); refreshProps(); markUnsaved(true);
+  if (typeof renderModelsPanel === 'function' && _panelTabs && _panelTabs.active === 'models') renderModelsPanel();
+  flash(`已从库移除「${d.name}」`, 'success');
+}
+function confirmDeleteBuiltIn(key, hard) {
+  const d = FURN[key];
+  if (!d) return;
+  const used = (doc.furniture || []).filter(f => f.type === key).length;
+  const fileNote = d.file
+    ? `<br>磁盘文件 <code>libs/items/${d.file}/model.glb</code> 将被永久删除。`
+    : '<br>该模型是参数化生成,无磁盘文件可删。';
+  tpDialog('删除内置模型', `
+    <div class="note">将删除「${d.name}」${used ? `及其已放置的 ${used} 件实例` : ''}。${fileNote}<br>此操作可通过撤销恢复 FURN 表(磁盘文件无法恢复)。</div>`,
+    [
+      { t: '取消' },
+      { t: d.file ? '删除 GLB' : '删除', danger: true, fn: () => doDeleteBuiltIn(key, hard) },
+    ]);
+}
+async function doDeleteBuiltIn(key, hard) {
+  const d = FURN[key];
+  if (!d) return;
+  pushUndo({ furnRestore: { [key]: d } });
+  doc.furniture = (doc.furniture || []).filter(f => f.type !== key);
+  delete FURN[key];
+  if (d.file) _glbCache.delete(key);
+  if (furnType === key) furnType = null;
+  rebuild(); refreshProps(); markUnsaved(true);
+  if (hard && d.file) {
+    try {
+      const r = await fetch('/api/items/del?dir=' + encodeURIComponent(d.file));
+      const j = await r.json();
+      if (!j.ok) toast('磁盘文件删除失败:' + (j.error || ''), 'error', 4000);
+    } catch (e) { toast('磁盘文件删除请求失败:' + e.message, 'error', 4000); }
+  }
+  if (typeof renderModelsPanel === 'function' && _panelTabs && _panelTabs.active === 'models') renderModelsPanel();
+  flash(`已删除「${d.name}」`, 'success');
+}
+
 function _showFileContextMenu(x, y, entry) {
   const m = document.getElementById('ctxMenu');
   if (!m) return;
@@ -11531,8 +11636,8 @@ async function maybeMigrateOldPlan() {
 
 // 让 doc 变更函数标记 dirty:hook 进 pushUndo,这样所有"修改类"动作(undo 不算)都会标脏
 const _origPushUndo = pushUndo;
-pushUndo = function () {
-  _origPushUndo();
+pushUndo = function (furnDelta) {
+  _origPushUndo(furnDelta);
   // 注意:undo/redo 自己 pushUndo 时也会被 hook — 显式跳过
   if (_inUndoRedo) return;
   markUnsaved(true);

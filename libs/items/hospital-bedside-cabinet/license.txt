@@ -1,0 +1,11 @@
+Model Information:
+* title:	Hospital medical bedside cabinet
+* source:	https://sketchfab.com/3d-models/hospital-medical-bedside-cabinet-32a2c516d2a049b2a403a30f906054cb
+* author:	Chenchanchong (https://sketchfab.com/Chenchanchong)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Hospital medical bedside cabinet" (https://sketchfab.com/3d-models/hospital-medical-bedside-cabinet-32a2c516d2a049b2a403a30f906054cb) by Chenchanchong (https://sketchfab.com/Chenchanchong) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

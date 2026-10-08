@@ -1,0 +1,11 @@
+Model Information:
+* title:	Hospital bench
+* source:	https://sketchfab.com/3d-models/hospital-bench-07a86471d6894df295a0436db3227978
+* author:	nkulekoqiniso (https://sketchfab.com/nkulekoqiniso)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Hospital bench" (https://sketchfab.com/3d-models/hospital-bench-07a86471d6894df295a0436db3227978) by nkulekoqiniso (https://sketchfab.com/nkulekoqiniso) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

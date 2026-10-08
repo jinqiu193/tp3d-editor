@@ -1,0 +1,11 @@
+Model Information:
+* title:	Hospital examination and treatment chair
+* source:	https://sketchfab.com/3d-models/hospital-examination-and-treatment-chair-6723076791f047fdb3b0e055173f04d2
+* author:	Chenchanchong (https://sketchfab.com/Chenchanchong)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Hospital examination and treatment chair" (https://sketchfab.com/3d-models/hospital-examination-and-treatment-chair-6723076791f047fdb3b0e055173f04d2) by Chenchanchong (https://sketchfab.com/Chenchanchong) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

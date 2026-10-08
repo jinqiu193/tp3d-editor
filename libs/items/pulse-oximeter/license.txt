@@ -1,0 +1,11 @@
+Model Information:
+* title:	Pulse oximeter Ⅱ
+* source:	https://sketchfab.com/3d-models/pulse-oximeter-ii-045c7ea17bb9441da84f6c3dc2283062
+* author:	星医療酸器 (https://sketchfab.com/7634hosi)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Pulse oximeter Ⅱ" (https://sketchfab.com/3d-models/pulse-oximeter-ii-045c7ea17bb9441da84f6c3dc2283062) by 星医療酸器 (https://sketchfab.com/7634hosi) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

@@ -963,6 +963,125 @@
   }
 
   /* ── 主题面板 ── */
+  /* 模型管理面板：第 5 个 panel tab */
+  #modelsPanel {
+    flex: none;
+    width: 260px;
+    background: var(--surface-0);
+    border-right: 1px solid var(--border);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  #modelsPanel.open { display: flex; }
+  #modelsPanel .mp-head {
+    flex: none;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  #modelsPanel .mp-title {
+    font-weight: 700;
+    font-size: var(--fs-md);
+    color: var(--ink);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  #modelsPanel .mp-hint {
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+  #modelsPanel .mp-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 10px 12px;
+  }
+  #modelsPanel .fcat { margin-bottom: 6px; }
+  #modelsPanel .fcat > summary {
+    cursor: pointer;
+    padding: 4px 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-2);
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 4px;
+  }
+  #modelsPanel .fcat > summary::-webkit-details-marker { display: none; }
+  #modelsPanel .fcat > summary::before {
+    content: '▸';
+    font-size: 10px;
+    color: var(--ink-3);
+    transition: transform .12s;
+  }
+  #modelsPanel .fcat[open] > summary::before { transform: rotate(90deg); }
+  #modelsPanel .fcat > summary .cnt {
+    margin-left: auto;
+    font-size: 10.5px;
+    color: var(--ink-3);
+    background: var(--surface-1, var(--surface-0));
+    padding: 1px 6px;
+    border-radius: 8px;
+  }
+  #modelsPanel .fgrid {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 2px 0 6px;
+  }
+  #modelsPanel .fmodelRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  #modelsPanel .fmodelRow:hover { background: var(--surface-1, rgba(0,0,0,.04)); }
+  #modelsPanel .fmodelRow .em {
+    font-size: 14px;
+    width: 18px;
+    text-align: center;
+    flex: none;
+  }
+  #modelsPanel .fmodelRow .fname {
+    flex: 1;
+    color: var(--ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #modelsPanel .fmodelRow .fcat-badge {
+    font-size: 10px;
+    color: var(--ink-3);
+    background: var(--surface-1, rgba(0,0,0,.04));
+    padding: 1px 5px;
+    border-radius: 3px;
+    flex: none;
+  }
+  #modelsPanel .fmodelRow .cnt {
+    font-size: 10.5px;
+    color: var(--accent);
+    font-weight: 600;
+    flex: none;
+  }
+  #modelsPanel .fmodelRow .fmodelBtns {
+    display: flex;
+    gap: 3px;
+    flex: none;
+  }
+  #modelsPanel .fmodelRow .btn.sm {
+    padding: 2px 6px;
+    font-size: 10.5px;
+    line-height: 1.2;
+  }
+  #modelsPanel .fsearch { width: 100%; box-sizing: border-box; }
+  #modelsPanel .fmodelRow.inUse { background: rgba(99,102,241,.06); }
   #themePanel {
     flex: none;
     width: 220px;
@@ -2258,6 +2377,9 @@
       <button class="panel-tab" data-panel="inspector" title="属性 (自动跟随选中)">
         <svg viewBox="0 0 16 16" class="icon"><rect x="2" y="2" width="12" height="12" rx="1.5"/><path d="M5 6h6M5 8h4M5 10h6"/></svg>
       </button>
+      <button class="panel-tab" data-panel="models" title="模型管理 (浏览 / 删除)">
+        <svg viewBox="0 0 16 16" class="icon"><path d="M8 1.5l5.5 3v7L8 14.5 2.5 11.5v-7z"/><path d="M8 1.5v13M2.5 4.5l11 0"/></svg>
+      </button>
     </nav>
 
     <aside id="outlinePanel">
@@ -2326,6 +2448,17 @@
 </div>
 
     <div id="inspector"><div id="propsBody"></div></div>
+
+    <aside id="modelsPanel" aria-label="模型管理面板">
+      <div class="mp-head">
+        <span class="mp-title">
+          <svg viewBox="0 0 16 16" class="icon"><path d="M8 1.5l5.5 3v7L8 14.5 2.5 11.5v-7z"/><path d="M8 1.5v13M2.5 4.5l11 0"/></svg>
+          模型管理
+        </span>
+        <span class="mp-hint">浏览并删除当前文档可用的模型</span>
+      </div>
+      <div class="mp-body" id="modelsBody"></div>
+    </aside>
 
     <div id="stage">
       <div id="canvasWrap">
