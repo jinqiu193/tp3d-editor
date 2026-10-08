@@ -90,13 +90,17 @@
     --r-xl: 18px;
     --r-pill: 9999px;
 
-    /* 阴影（柔化） */
+    /* 阴影（柔化，双层 elevation） */
     --shadow-sm: 0 1px 2px rgba(15, 23, 42, .04), 0 1px 1px rgba(15, 23, 42, .03);
     --shadow-md: 0 4px 12px rgba(15, 23, 42, .06), 0 2px 4px rgba(15, 23, 42, .04);
     --shadow-lg: 0 16px 40px rgba(15, 23, 42, .14), 0 4px 12px rgba(15, 23, 42, .06);
+    --shadow-xl: 0 24px 70px rgba(15, 23, 42, .18), 0 8px 20px rgba(15, 23, 42, .08);
     --shadow-glow: 0 0 0 1px color-mix(in srgb, #6366f1 30%, transparent),
                     0 8px 24px color-mix(in srgb, #6366f1 18%, transparent);
     --shadow-toast: 0 8px 24px rgba(0, 0, 0, .25);
+    /* 焦点环 / 原生控件 */
+    --ring: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+    --select-chevron: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235b6577' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
 
     /* 过渡 */
     --tx: 180ms cubic-bezier(.2, .8, .2, 1);
@@ -104,7 +108,9 @@
   }
 
   /* ── 深色模式 token 覆盖 ── */
+  :root { color-scheme: light; }
   :root[data-theme="dark"] {
+    color-scheme: dark;
     --ink: #e7ebf2;
     --ink-2: #b8c0cc;
     --ink-3: #8b95a7;
@@ -125,7 +131,9 @@
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, .35), 0 1px 1px rgba(0, 0, 0, .25);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, .45), 0 2px 4px rgba(0, 0, 0, .30);
     --shadow-lg: 0 16px 40px rgba(0, 0, 0, .55), 0 4px 12px rgba(0, 0, 0, .35);
+    --shadow-xl: 0 24px 70px rgba(0, 0, 0, .65), 0 8px 20px rgba(0, 0, 0, .45);
     --shadow-toast: 0 8px 24px rgba(0, 0, 0, .55);
+    --select-chevron: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b95a7' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
 
     /* 深色模式专属:顶栏/舞台/十字线/perfPanel */
     --topbar-bg: rgba(12, 17, 22, .82);
@@ -174,6 +182,8 @@
     text-rendering: optimizeLegibility;
   }
   #app { position: fixed; inset: 0; display: flex; flex-direction: column; }
+  /* 原生控件跟随主题色（checkbox / radio / range / progress） */
+  * { accent-color: var(--accent); }
   button {
     font-family: inherit;
     transition: background var(--tx), color var(--tx),
@@ -184,15 +194,54 @@
     font-family: inherit;
     transition: border-color var(--tx), box-shadow var(--tx), background var(--tx);
   }
+  /* number 输入去原生 spinner（面板已有自定义 ± 步进按钮） */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+  /* select 统一外观：去原生箭头,换主题箭头 */
+  select {
+    -webkit-appearance: none; appearance: none;
+    background-image: var(--select-chevron);
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 26px;
+  }
 
   /* 焦点环 */
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-radius: var(--r-sm); }
   input:focus-visible, select:focus-visible, textarea:focus-visible {
     outline: none;
     border-color: var(--accent) !important;
-    box-shadow: 0 0 0 3px var(--accent-soft);
+    box-shadow: var(--ring);
   }
-  button:disabled, input:disabled, select:disabled { opacity: .45; cursor: not-allowed; }
+  button:disabled, input:disabled, select:disabled, textarea:disabled { opacity: .45; cursor: not-allowed; }
+
+  /* 弹窗内 textarea 统一（原为各处内联样式） */
+  .tpdlg .body textarea {
+    width: 100%; box-sizing: border-box; resize: vertical;
+    padding: 8px 10px;
+    font: inherit; font-size: var(--fs-sm); line-height: 1.6;
+    color: var(--ink);
+    background: var(--surface-0);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-md);
+    min-height: 56px;
+  }
+  .tpdlg .body textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: var(--ring);
+  }
+  .tpdlg .body textarea::placeholder { color: var(--ink-3); }
+
+  /* 动效降级：尊重系统"减少动态效果" */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+    }
+  }
 
   /* 滚动条 */
   ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -357,7 +406,8 @@
     cursor: pointer;
     transition: background var(--tx-fast);
   }
-  .ditem:hover, .ditem:focus-visible { background: var(--hover-bg); outline: none; }
+  .ditem:hover { background: var(--hover-bg); }
+  .ditem:focus-visible { background: var(--hover-bg); }
   .ditem:active { background: var(--press-bg); }
   .ditem.on { background: var(--accent-soft); color: var(--accent); }
   .ditem.on .dicon { background: var(--accent); color: #fff; }
@@ -383,14 +433,75 @@
     letter-spacing: .01em;
   }
 
+  /* ── 图标系统 ── */
+  .icon {
+    width: 16px; height: 16px;
+    display: inline-block; vertical-align: -2px;
+    fill: none; stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round; stroke-linejoin: round;
+    flex: none;
+  }
+  .icon.caret { width: 10px; height: 10px; vertical-align: -1px; opacity: .65; }
+  .ditem .dicon { display: inline-flex; align-items: center; justify-content: center; padding: 0; background: transparent; }
+  .ditem .dicon .icon { color: var(--accent); }
+  .fp-title, .th-title, .otHead b {
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .fp-title .icon, .th-title .icon { color: var(--ink-2); }
+  .th-menu-item { display: flex; align-items: center; gap: 8px; }
+  .th-menu-item .th-menu-ico { width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-2); }
+  .th-menu-item.danger .th-menu-ico { color: var(--danger); }
+  .ic svg.icon { vertical-align: -2px; }
+  .lock svg.icon, .del svg.icon, .vis svg.icon { width: 12px; height: 12px; }
+  .em svg.icon { vertical-align: -2px; }
+  .fsbtn { padding: 0; }
+  .fsbtn .icon { display: block; }
+  .statusbar kbd { /* .kbd default is already styled */ }
+
+  /* ── 顶栏 undo / redo 计数按钮 ── */
+  .undo-redo .tb { padding: 4px 8px; display: inline-flex; align-items: center; gap: 4px; }
+  .undo-redo .tb .tb-count {
+    font-size: var(--fs-2xs); font-variant-numeric: tabular-nums;
+    color: var(--ink-2); font-weight: 600;
+    min-width: 12px; text-align: left;
+  }
+  .undo-redo .tb:disabled { opacity: .4; cursor: not-allowed; }
+  .undo-redo .tb:disabled .tb-count { color: var(--ink-3); }
+
+  /* ── 顶栏 dtrigger 内的图标 + 文字 ── */
+  .dtrigger .lbl { margin-left: 2px; }
+  .ddrop.ai .dtrigger {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 16%, transparent), color-mix(in srgb, #c026d3 12%, transparent));
+    border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+    color: var(--accent);
+  }
+  .ddrop.ai.open .dtrigger { background: var(--accent); color: #fff; }
+  .ddrop.ai.open .dtrigger .icon { color: #fff; }
+
+  /* ── 状态栏键盘提示 ── */
+  #statusbar #keys { color: var(--ink-2); font-size: var(--fs-2xs); }
+  #statusbar #keys kbd {
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 10px; padding: 1px 5px;
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    background: var(--surface-0);
+    color: var(--ink-2);
+    margin: 0 1px;
+    font-weight: 600;
+  }
+  #undoTip[hidden] { display: none; }
+
   /* ── 主区 ── */
   #main { flex: 1; display: flex; min-height: 0; }
 
-  /* ── 左侧图标栏 ── */
+  /* ── 左侧工具栏 (8 个工具,纯图标) ── */
   #rail {
-    width: 56px; flex: none;
+    width: 42px; flex: none;
     background: linear-gradient(180deg, var(--surface-deep) 0%, var(--surface-deep-2) 100%);
-    padding: var(--sp-3) 6px;
+    padding: var(--sp-3) 0;
     display: flex; flex-direction: column; align-items: center; gap: 2px;
     user-select: none;
     overflow-y: auto;
@@ -398,31 +509,24 @@
     box-shadow: 1px 0 0 rgba(255,255,255,.02) inset;
   }
   .railbtn {
-    width: 42px; padding: 8px 0 6px;
+    width: 36px; height: 36px; padding: 0;
     border: none; border-radius: var(--r-md);
     cursor: pointer;
     background: transparent;
     color: var(--ink-on-deep-2);
-    text-align: center;
+    display: inline-flex; align-items: center; justify-content: center;
     position: relative;
     transition: background var(--tx-fast), color var(--tx-fast), transform var(--tx-fast);
   }
-  .railbtn .g {
-    display: block; font-size: 17px; line-height: 20px; font-weight: 700;
-    font-family: "Segoe UI Symbol", "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+  .railbtn .icon {
+    width: 18px; height: 18px;
     transition: transform var(--tx);
-  }
-  .railbtn .t {
-    display: block; font-size: 10px; line-height: 14px;
-    margin-top: 2px; opacity: .82;
-    font-weight: 500;
-    letter-spacing: .02em;
   }
   .railbtn:hover {
     background: var(--surface-deep-3);
     color: var(--ink-on-deep);
   }
-  .railbtn:hover .g { transform: scale(1.08); }
+  .railbtn:hover .icon { transform: scale(1.08); }
   .railbtn.active {
     background: color-mix(in srgb, #6366f1 18%, transparent);
     color: #fff;
@@ -432,7 +536,7 @@
   }
   .railbtn.active::before {
     content: ''; position: absolute;
-    left: -6px; top: 7px; bottom: 7px;
+    left: -8px; top: 6px; bottom: 6px;
     width: 3px;
     background: linear-gradient(180deg, #a5b4fc, var(--accent) 60%, #4f46e5);
     border-radius: 0 3px 3px 0;
@@ -461,6 +565,38 @@
     width: 3px; height: 3px;
     background: var(--deep-border);
     border-radius: 50%;
+  }
+
+  /* ── 面板 tab 切换条 ── */
+  #panelTabs {
+    width: 42px; flex: none;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: var(--sp-2) 0;
+    background: var(--surface-1);
+    border-right: 1px solid var(--border);
+    user-select: none;
+  }
+  .panel-tab {
+    width: 36px; height: 36px; padding: 0;
+    border: none; background: transparent;
+    border-radius: var(--r-md);
+    color: var(--ink-3);
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    position: relative;
+    transition: background var(--tx-fast), color var(--tx-fast);
+  }
+  .panel-tab:hover { background: var(--hover-bg); color: var(--ink); }
+  .panel-tab.active {
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .panel-tab.active::after {
+    content: ''; position: absolute;
+    right: -1px; top: 8px; bottom: 8px;
+    width: 2px;
+    background: var(--accent);
+    border-radius: 2px 0 0 2px;
   }
 
   /* 舞台 */
@@ -617,7 +753,7 @@
     font-weight: 500;
     transition: background var(--tx-fast), color var(--tx-fast);
   }
-  #ctxMenu .ci:hover { background: var(--accent-soft); color: var(--accent); }
+  #ctxMenu .ci:hover { background: var(--hover-bg); color: var(--ink); }
   #ctxMenu .ci.danger { color: var(--danger); }
   #ctxMenu .ci.danger:hover { background: var(--danger-soft); color: var(--danger); }
   #ctxMenu .ci .kb {
@@ -639,7 +775,9 @@
     /* 自身既作 panel 又作遮罩;让出顶栏区(top:46)使外观按钮仍可点 */
     position: fixed; left: 0; top: 46px; right: 0; bottom: 0;
     display: none; z-index: 950;
-    background: rgba(0, 0, 0, 0.55);
+    background: rgba(15, 23, 42, .5);
+    backdrop-filter: blur(6px) saturate(150%);
+    -webkit-backdrop-filter: blur(6px) saturate(150%);
     animation: appBdfIn 200ms ease-out;
   }
   #appearanceMenu .ap-panel {
@@ -682,7 +820,7 @@
     margin-bottom: 4px;
   }
   #appearanceMenu .ci:last-of-type { margin-bottom: 0; }
-  #appearanceMenu .ci:hover { background: var(--accent-soft); color: var(--accent); }
+  #appearanceMenu .ci:hover { background: var(--hover-bg); color: var(--ink); }
   #appearanceMenu .ci.active { color: var(--accent); font-weight: 600; background: var(--accent-soft); }
   #appearanceMenu .ci .ico { font-size: var(--fs-md); width: 18px; text-align: center; }
   #appearanceMenu .ci .check { margin-left: auto; color: var(--accent); opacity: 0; }
@@ -726,7 +864,7 @@
     flex: none;
     width: 240px;
     background: var(--surface-0);
-    border-right: 1px solid rgba(15,23,42,.06);
+    border-right: 1px solid var(--border);
     flex-direction: column;
     overflow: hidden;
   }
@@ -736,20 +874,22 @@
     flex: none;
     display: flex; align-items: center; justify-content: space-between;
     padding: 8px 10px;
-    border-bottom: 1px solid rgba(15,23,42,.05);
+    border-bottom: 1px solid var(--border);
   }
   #filesPanel .fp-title { font-weight: 700; font-size: var(--fs-md); color: var(--ink); }
   #filesPanel .fp-actions { display: flex; gap: 4px; }
   #filesPanel .fp-btn {
-    width: 26px; height: 26px;
-    border: 1px solid rgba(15,23,42,.08);
+    width: 26px; height: 26px; padding: 0;
+    border: 1px solid var(--border);
     background: var(--surface-1);
     color: var(--ink-2);
     border-radius: 6px;
     cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
     font-size: 14px; line-height: 1;
     transition: background var(--tx-fast), color var(--tx-fast);
   }
+  #filesPanel .fp-btn .icon { width: 14px; height: 14px; }
   #filesPanel .fp-btn:hover { background: var(--accent-soft); color: var(--accent); }
   #filesPanel .fp-list { flex: 1; overflow-y: auto; padding: 6px; }
   #filesPanel .fp-item {
@@ -775,7 +915,8 @@
     display: flex; align-items: center; gap: 6px;
     font-size: var(--fs-sm); font-weight: 600;
   }
-  #filesPanel .fp-item .fp-row1 .fp-ico { color: var(--ink-3); font-size: 14px; }
+  #filesPanel .fp-item .fp-row1 .fp-ico { color: var(--ink-3); display: inline-flex; align-items: center; }
+  #filesPanel .fp-item .fp-row1 .fp-ico .icon { width: 14px; height: 14px; }
   #filesPanel .fp-item.current .fp-row1 .fp-ico { color: var(--accent); }
   #filesPanel .fp-item .fp-row2 {
     display: flex; align-items: center; gap: 6px;
@@ -804,7 +945,7 @@
   }
   #filesPanel .fp-empty button {
     margin-top: 8px;
-    border: 1px solid rgba(15,23,42,.12);
+    border: 1px solid transparent;
     background: var(--accent);
     color: #fff;
     padding: 6px 14px;
@@ -815,7 +956,7 @@
   #filesPanel .fp-foot {
     flex: none;
     padding: 6px 10px;
-    border-top: 1px solid rgba(15,23,42,.05);
+    border-top: 1px solid var(--border);
     font-size: 10px;
     color: var(--ink-3);
     line-height: 1.4;
@@ -826,7 +967,7 @@
     flex: none;
     width: 220px;
     background: var(--surface-0);
-    border-right: 1px solid rgba(15,23,42,.06);
+    border-right: 1px solid var(--border);
     display: none;            /* 默认收起；点 rail「主题」按钮才展开 */
     flex-direction: column;
     overflow: hidden;
@@ -838,7 +979,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(15,23,42,.06);
+    border-bottom: 1px solid var(--border);
     font-size: var(--fs-sm);
   }
   #themePanel .th-title { font-weight: 700; font-size: var(--fs-md); color: var(--ink); }
@@ -893,7 +1034,7 @@
   #themePanel .th-foot {
     flex: none;
     padding: 8px 12px;
-    border-top: 1px solid rgba(15,23,42,.06);
+    border-top: 1px solid var(--border);
   }
   #themePanel .th-toggle {
     display: flex;
@@ -904,7 +1045,7 @@
     font-size: var(--fs-sm);
     color: var(--ink-2, var(--ink));
     cursor: pointer;
-    border-top: 1px dashed rgba(15,23,42,.08);
+    border-top: 1px dashed var(--border);
     user-select: none;
   }
   #themePanel .th-toggle input {
@@ -973,7 +1114,7 @@
     color: var(--ink);
     display: flex; align-items: center; gap: 6px;
   }
-  #themeMenu .th-menu-item:hover { background: var(--accent-soft); color: var(--accent); }
+  #themeMenu .th-menu-item:hover { background: var(--hover-bg); color: var(--ink); }
   #themeMenu .th-menu-item.danger { color: var(--danger); }
   #themeMenu .th-menu-item.danger:hover { background: var(--danger-soft); color: var(--danger); }
   #themeMenu .th-menu-sep { height: 1px; background: var(--border); margin: 4px 2px; }
@@ -1030,7 +1171,7 @@
     display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
     margin-top: 10px;
     padding-top: 8px;
-    border-top: 1px dashed rgba(15,23,42,.08);
+    border-top: 1px dashed var(--border);
   }
   #themePanel .th-editpane .th-form-foot .btn { padding: 7px; font-size: 12px; }
   #themePanel .th-editpane .th-form-foot .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
@@ -1198,13 +1339,6 @@
     padding-bottom: var(--sp-2);
     border-bottom: 1px dashed var(--border);
   }
-  .card h3::before {
-    content: '';
-    width: 3px; height: 12px;
-    background: linear-gradient(180deg, #818cf8, var(--accent) 70%, var(--accent-press));
-    border-radius: 2px;
-    box-shadow: 0 0 6px rgba(99,102,241,.35);
-  }
   .frow {
     display: flex; align-items: center; justify-content: space-between;
     margin-bottom: var(--sp-2);
@@ -1284,9 +1418,9 @@
     height: 32px;
   }
   .btn:hover {
-    border-color: var(--accent); color: var(--accent);
-    background: var(--accent-soft);
-    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border-strong));
+    color: var(--accent);
+    background: var(--surface-0);
     box-shadow: var(--shadow-sm);
   }
   .btn:active { transform: translateY(0) scale(.98); }
@@ -1299,7 +1433,6 @@
   .btn.primary:hover {
     background: var(--accent-hover); color: #fff;
     border-color: var(--accent-hover);
-    transform: translateY(-1px);
     box-shadow:
       var(--shadow-md),
       0 4px 12px color-mix(in srgb, #6366f1 30%, transparent);
@@ -1383,9 +1516,7 @@
   }
   .styleBtn:hover {
     background: var(--accent-soft);
-    border-color: var(--accent);
-    color: var(--accent);
-    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border-strong));
     box-shadow: var(--shadow-sm);
   }
   .styleBtn.on {
@@ -1418,10 +1549,8 @@
                 color var(--tx-fast), transform var(--tx-fast), box-shadow var(--tx-fast);
   }
   .fitem:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: var(--accent-soft);
-    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border-strong));
+    background: var(--surface-0);
     box-shadow: var(--shadow-md);
   }
   .fitem.active {
@@ -1499,10 +1628,9 @@
   }
   .fcat > summary:hover { background: var(--surface-3); border-color: var(--border-strong); }
   .fcat[open] > summary {
-    color: var(--accent);
-    background: var(--accent-soft);
-    border-color: color-mix(in srgb, #6366f1 22%, transparent);
-    box-shadow: 0 0 0 1px color-mix(in srgb, #6366f1 8%, transparent);
+    color: var(--ink);
+    background: var(--surface-1);
+    border-color: color-mix(in srgb, var(--accent) 30%, var(--border-strong));
   }
   .fcat > summary .cnt {
     font-size: var(--fs-2xs); font-weight: 600;
@@ -1516,8 +1644,8 @@
   }
   .fcat[open] > summary .cnt {
     color: var(--accent);
-    background: var(--surface-0);
-    border-color: color-mix(in srgb, #6366f1 25%, transparent);
+    background: var(--accent-tint);
+    border-color: color-mix(in srgb, var(--accent) 25%, transparent);
   }
   .fcat > .fgrid { padding-top: var(--sp-2); }
   .fcat:not([open]) > .fgrid { display: none; }
@@ -1618,7 +1746,7 @@
     animation: overlayIn 180ms ease-out;
   }
   #cmdPalette .cmd-panel {
-    position: absolute; left: 50%; top: 18%; transform: translateX(-50%);
+    position: absolute; left: 50%; top: 52px; transform: translateX(-50%);
     width: 580px; max-width: 92vw;
     background: var(--panel);
     border: 1px solid var(--border);
@@ -1635,11 +1763,17 @@
     to   { opacity: 1; transform: translateX(-50%) none; }
   }
   #cmdPalette input {
-    width: 100%; padding: 16px 20px;
+    width: 100%; padding: 14px 20px 14px 44px;
     background: transparent; border: 0;
     border-bottom: 1px solid var(--border);
     color: var(--ink); font: inherit; font-size: 15px; outline: none;
     font-weight: 500;
+  }
+  #cmdPalette .cmd-panel { position: absolute; }
+  #cmdPalette .cmd-search-icon {
+    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+    color: var(--ink-3);
+    pointer-events: none;
   }
   #cmdPalette input::placeholder { color: var(--ink-3); font-weight: 400; }
   #cmdPalette input:focus { border-bottom-color: var(--accent); }
@@ -1653,7 +1787,7 @@
     transition: background var(--tx-fast), color var(--tx-fast);
   }
   #cmdList .cmd-item:hover, #cmdList .cmd-item.sel {
-    background: var(--accent-soft); color: var(--accent);
+    background: var(--accent-soft); color: var(--ink);
   }
   #cmdList .cmd-item .name { flex: 1; font-weight: 500; }
   #cmdList .cmd-item .kb {
@@ -1806,12 +1940,13 @@
     background: var(--panel); color: var(--ink);
     border: 1px solid var(--border);
     border-radius: var(--r-xl);
-    box-shadow:
-      var(--shadow-lg),
-      0 0 0 1px rgba(255,255,255,.04) inset;
+    box-shadow: var(--shadow-xl);
     padding: 22px 24px;
     animation: dlgIn 280ms cubic-bezier(.2, .8, .2, 1);
   }
+  .tpdlg.compact { width: 360px; padding: 18px 20px; }
+  .tpdlg.compact h3 { font-size: 15px; margin-bottom: 10px; }
+  .tpdlg.wide { width: 720px; padding: 24px 28px; }
   @keyframes dlgIn {
     from { opacity: 0; transform: translateY(12px) scale(.97); }
     to   { opacity: 1; transform: none; }
@@ -1823,13 +1958,6 @@
     padding-bottom: 12px;
     border-bottom: 1px solid var(--border);
     letter-spacing: -.01em;
-  }
-  .tpdlg h3::before {
-    content: '';
-    width: 4px; height: 18px;
-    background: linear-gradient(180deg, #818cf8, var(--accent) 60%, var(--accent-press));
-    border-radius: 3px;
-    box-shadow: 0 0 8px rgba(99,102,241,.4);
   }
   .tpdlg .body {
     line-height: 1.7;
@@ -1958,6 +2086,56 @@
   #perfPanel .perfBody div { display: flex; justify-content: space-between; gap: 12px; }
   #perfPanel .pl { opacity: 0.55; }
   #perfPanel #perfFps { color: #10b981; font-weight: 600; }
+
+  /* ── AI 弹窗组件（自内联样式迁出,适配深浅两主题） ── */
+  .dropzone {
+    margin-top: 8px;
+    padding: 14px;
+    border: 2px dashed var(--border-strong);
+    border-radius: var(--r-md);
+    color: var(--ink-3);
+    text-align: center;
+    transition: border-color var(--tx-fast), background var(--tx-fast), color var(--tx-fast);
+  }
+  .dropzone.dragover {
+    border-color: var(--accent);
+    background: var(--accent-tint);
+    color: var(--accent);
+  }
+  .aiStyleCard {
+    cursor: pointer;
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 8px;
+    background: var(--surface-1);
+    display: flex; flex-direction: column; gap: 6px;
+    transition: border-color var(--tx-fast), box-shadow var(--tx-fast), background var(--tx-fast);
+  }
+  .aiStyleCard:hover {
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border-strong));
+    box-shadow: var(--shadow-md);
+  }
+  .aiStyleCard .asc-head { display: flex; align-items: center; gap: 8px; }
+  .aiStyleCard .asc-icon { font-size: 20px; }
+  .aiStyleCard .asc-name { font-weight: 600; color: var(--ink); }
+  .aiStyleCard .asc-desc { font-size: 12px; color: var(--ink-2); min-height: 32px; line-height: 1.5; }
+  .aiStyleCard .asc-swatch-lg {
+    display: flex; gap: 3px; height: 34px;
+    border-radius: 4px; overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .aiStyleCard .asc-swatch-sm { display: flex; gap: 3px; height: 14px; border-radius: 3px; overflow: hidden; }
+  .aiMetaCard {
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    background: var(--surface-1);
+  }
+  .aiMetaCard .amc-head { display: flex; align-items: center; gap: 8px; font-size: 20px; }
+  .aiMetaCard .amc-name { font-weight: 600; font-size: var(--fs-md); color: var(--ink); }
+  .aiMetaCard .amc-cat { font-size: 12px; color: var(--ink-3); }
+  .aiMetaCard .amc-line { font-size: 12px; color: var(--ink-2); margin-top: 4px; line-height: 1.5; }
+  .note-warn { color: var(--warn); font-weight: 500; }
 </style>
 </head>
 <body>
@@ -1965,6 +2143,17 @@
   <div id="topbar">
     <div class="brand">TP3D<span>户型编辑器</span></div>
     <div class="tbgroup" id="lvSeg"></div>
+    <div class="tbgroup undo-redo" id="undoRedo" title="撤销 / 重做 (Ctrl+Z / Ctrl+Y)">
+      <button class="tb tb-undo" id="btnUndo" disabled title="撤销 (Ctrl+Z)">
+        <svg viewBox="0 0 16 16" class="icon"><path d="M3 7l4-4v3h4a4 4 0 010 8h-2"/></svg>
+        <span class="tb-count">0</span>
+      </button>
+      <button class="tb tb-redo" id="btnRedo" disabled title="重做 (Ctrl+Y)">
+        <svg viewBox="0 0 16 16" class="icon"><path d="M13 7l-4-4v3H5a4 4 0 000 8h2"/></svg>
+        <span class="tb-count">0</span>
+      </button>
+    </div>
+    <span class="tbsep"></span>
     <div class="spacer"></div>
     <div class="tbgroup" id="wallModeSeg" title="画墙模式（Tab 切换）" style="display:none">
       <button class="tb" data-wm="single">单段</button>
@@ -1972,61 +2161,111 @@
       <button class="tb" data-wm="room">围房</button>
       <button class="tb" id="btnOrtho" title="切换画墙角度锁定。默认自由角度（首尾自动吸附），开启后强制水平/垂直。Shift 临时反转">正交</button>
     </div>
-    <div class="ddrop" id="ddFile">
-      <button class="abtn dtrigger" title="导出 / 文件操作">文件 <span class="caret">▾</span></button>
+    <button class="tb tb-icon" id="btn-save" title="保存当前方案 (Ctrl+S)">
+      <svg viewBox="0 0 16 16" class="icon"><path d="M3 2h8l3 3v8a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M5 2v4h6V2M5 10h6v4H5z"/></svg>
+    </button>
+    <button class="tb tb-icon" id="btn-open" title="打开方案 (Ctrl+O)">
+      <svg viewBox="0 0 16 16" class="icon"><path d="M2 4a1 1 0 011-1h3l1.5 1.5H13a1 1 0 011 1V13a1 1 0 01-1 1H3a1 1 0 01-1-1z"/></svg>
+    </button>
+    <span class="tbsep"></span>
+    <div class="ddrop" id="ddImport">
+      <button class="abtn dtrigger" title="导入素材">
+        <svg viewBox="0 0 16 16" class="icon"><path d="M8 10V2m-3 3l3-3 3 3M3 14h10"/></svg>
+        <span class="lbl">导入</span>
+        <svg viewBox="0 0 16 16" class="icon caret"><path d="M4 6l4 4 4-4"/></svg>
+      </button>
       <div class="dmenu">
-        <button class="ditem" id="btnJson"><span class="dicon">⌥</span><span class="dlabel">导出 plan.json</span><span class="dkb"></span></button>
-        <button class="ditem" id="btnGLB"><span class="dicon">⌘</span><span class="dlabel">导出 GLB 模型</span><span class="dkb">不含底图/网格</span></button>
-        <button class="ditem" id="btnDXF"><span class="dicon">📐</span><span class="dlabel">导出 DXF 平面图</span><span class="dkb">AutoCAD 2D</span></button>
+        <button class="ditem" id="btnUnderlay"><span class="dicon"><svg viewBox="0 0 16 16" class="icon"><rect x="2" y="2" width="12" height="12" rx="1"/><path d="M5 10l2-3 2 2 2-3"/></svg></span><span class="dlabel">导入平面图底图</span><span class="dkb"></span></button>
+        <button class="ditem" id="btnImportModel"><span class="dicon"><svg viewBox="0 0 16 16" class="icon"><path d="M8 1.5l6 3v7l-6 3-6-3v-7z"/><path d="M8 8v6.5M14 4.5L8 8 2 4.5"/></svg></span><span class="dlabel">导入 3D 模型</span><span class="dkb">GLB / glTF</span></button>
+        <button class="ditem" id="btnImportPlan"><span class="dicon"><svg viewBox="0 0 16 16" class="icon"><circle cx="8" cy="8" r="6"/><path d="M2 8h12M8 2c2 2 2 10 0 12M8 2c-2 2-2 10 0 12"/></svg></span><span class="dlabel">导入外部 3D HTML</span><span class="dkb">办公室3D.html</span></button>
+        <button class="ditem" id="btnImportAI"><span class="dicon"><svg viewBox="0 0 16 16" class="icon"><rect x="3" y="5" width="10" height="8" rx="1.5"/><circle cx="6" cy="9" r=".7"/><circle cx="10" cy="9" r=".7"/><path d="M8 5V3M6 1h4"/></svg></span><span class="dlabel">AI 转换 3D HTML</span><span class="dkb">PLAN → 内部 JSON</span></button>
       </div>
     </div>
-    <div class="ddrop" id="ddImport">
-      <button class="abtn dtrigger" title="导入素材">导入 <span class="caret">▾</span></button>
+    <div class="ddrop" id="ddFile">
+      <button class="abtn dtrigger" title="导出 / 文件操作">
+        <svg viewBox="0 0 16 16" class="icon"><path d="M8 2v8m-3-3l3 3 3-3M3 14h10"/></svg>
+        <span class="lbl">导出</span>
+        <svg viewBox="0 0 16 16" class="icon caret"><path d="M4 6l4 4 4-4"/></svg>
+      </button>
       <div class="dmenu">
-        <button class="ditem" id="btnUnderlay"><span class="dicon">▦</span><span class="dlabel">导入平面图底图</span><span class="dkb"></span></button>
-        <button class="ditem" id="btnImportModel"><span class="dicon">📦</span><span class="dlabel">导入 3D 模型</span><span class="dkb">GLB / glTF</span></button>
-        <button class="ditem" id="btnImportPlan"><span class="dicon">🌐</span><span class="dlabel">导入外部 3D HTML</span><span class="dkb">办公室3D.html</span></button>
-        <button class="ditem" id="btnImportAI"><span class="dicon">🤖</span><span class="dlabel">AI 转换 3D HTML</span><span class="dkb">PLAN → 内部 JSON</span></button>
+        <button class="ditem" id="btnJson"><span class="dicon"><svg viewBox="0 0 16 16" class="icon"><path d="M5 2H3v12h2M11 2h2v12h-2M6 6h4M6 10h4"/></svg></span><span class="dlabel">导出 plan.json</span><span class="dkb"></span></button>
+        <button class="ditem" id="btnGLB"><span class="dicon"><svg viewBox="0 0 16 16" class="icon"><path d="M8 1.5l6 3v7l-6 3-6-3v-7z"/></svg></span><span class="dlabel">导出 GLB 模型</span><span class="dkb">不含底图/网格</span></button>
+        <button class="ditem" id="btnDXF"><span class="dicon"><svg viewBox="0 0 16 16" class="icon"><rect x="2" y="3" width="12" height="10" rx="1"/><path d="M8 3v10M2 8h12"/></svg></span><span class="dlabel">导出 DXF 平面图</span><span class="dkb">AutoCAD 2D</span></button>
       </div>
     </div>
     <div class="ddrop" id="ddView">
-      <button class="abtn dtrigger" title="视图工具">视图 <span class="caret">▾</span></button>
+      <button class="abtn dtrigger" title="视图与场景">
+        <svg viewBox="0 0 16 16" class="icon"><rect x="2" y="2" width="12" height="12" rx="1"/><path d="M5 10l2-3 2 2 2-3"/></svg>
+        <span class="lbl">视图</span>
+        <svg viewBox="0 0 16 16" class="icon caret"><path d="M4 6l4 4 4-4"/></svg>
+      </button>
       <div class="dmenu">
-        <button class="ditem" id="btnRooms"><span class="dicon">▤</span><span class="dlabel">按墙环识别房间</span><span class="dkb">自动生成地面</span></button>
-        <button class="ditem" id="btnArea"><span class="dicon">⊕</span><span class="dlabel">切换面积标签</span><span class="dkb">显示 / 隐藏</span></button>
-        <button class="ditem" id="btnWallH" title="设置默认墙体高度（无选中对象时也能改）"><span class="dicon">↕</span><span class="dlabel">层高设置</span><span class="dkb" id="btnWallHKb"></span></button>
-        <button class="ditem" id="btnUnderlaySet" title="调整底图参数（无选中对象时也能用）"><span class="dicon">▦</span><span class="dlabel">底图设置</span><span class="dkb"></span></button>
-        <button class="ditem" id="btnFloorLock" title="锁定地面层，禁止通过鼠标移动"><span class="dicon">🔓</span><span class="dlabel">锁定地面层（禁止移动）</span><span class="dkb">关闭</span></button>
-        <button class="ditem" id="btnAssetDir" title="设置导入模型的保存目录(可随项目文件夹一起拷贝走)"><span class="dicon">📁</span><span class="dlabel">模型保存目录</span><span class="dkb" id="btnAssetDirKb">未设置</span></button>
+        <button class="ditem" id="btnRooms"><span class="dicon"><svg viewBox="0 0 16 16" class="icon"><path d="M2 5l6-3 6 3v6l-6 3-6-3z"/><path d="M2 5l6 3 6-3M8 8v6"/></svg></span><span class="dlabel">按墙环识别房间</span><span class="dkb">自动生成地面</span></button>
+        <button class="ditem" id="btnArea"><span class="dicon"><svg viewBox="0 0 16 16" class="icon"><path d="M2 13V3h6a3 3 0 013 0h3v7H5a3 3 0 00-3 3z"/></svg></span><span class="dlabel">切换面积标签</span><span class="dkb">显示 / 隐藏</span></button>
+        <button class="ditem" id="btnWallH" title="设置默认墙体高度（无选中对象时也能改）"><span class="dicon"><svg viewBox="0 0 16 16" class="icon"><path d="M8 2v14M5 5l3-3 3 3M5 11l3 3 3-3"/></svg></span><span class="dlabel">层高设置</span><span class="dkb" id="btnWallHKb"></span></button>
+        <button class="ditem" id="btnUnderlaySet" title="调整底图参数（无选中对象时也能用）"><span class="dicon"><svg viewBox="0 0 16 16" class="icon"><rect x="2" y="2" width="12" height="12" rx="1"/><path d="M5 10l2-3 2 2 2-3"/></svg></span><span class="dlabel">底图设置</span><span class="dkb"></span></button>
+        <button class="ditem" id="btnFloorLock" title="锁定地面层，禁止通过鼠标移动"><span class="dicon"><svg viewBox="0 0 16 16" class="icon"><rect x="3" y="7" width="10" height="7" rx="1"/><path d="M5 7V5a3 3 0 015-2"/></svg></span><span class="dlabel">锁定地面层（禁止移动）</span><span class="dkb">关闭</span></button>
+        <button class="ditem" id="btnAssetDir" title="设置导入模型的保存目录(可随项目文件夹一起拷贝走)"><span class="dicon"><svg viewBox="0 0 16 16" class="icon"><path d="M2 4a1 1 0 011-1h3l1.5 1.5H13a1 1 0 011 1V13a1 1 0 01-1 1H3a1 1 0 01-1-1z"/></svg></span><span class="dlabel">模型保存目录</span><span class="dkb" id="btnAssetDirKb">未设置</span></button>
       </div>
     </div>
-    <button class="tb" id="btn-view-toggle" aria-pressed="false" title="切换 2D / 3D 视图 (F5 / V)" style="min-width:42px">2D</button>
-    <button class="tb tb-icon hidden" id="btn-reset-view" title="重置视图到默认机位"><span>⤧</span></button>
-    <button class="tb tb-icon" id="btnAppearance" title="外观：深 / 浅 / 跟随系统"><span>◐</span></button>
+    <span class="tbsep"></span>
+    <div class="ddrop" id="ddAi">
+      <button class="abtn dtrigger ai" title="AI 功能">
+        <svg viewBox="0 0 16 16" class="icon"><path d="M8 2l1.6 3.4L13 7l-3.4 1.6L8 12l-1.6-3.4L3 7l3.4-1.6z"/></svg>
+        <span class="lbl">AI</span>
+        <svg viewBox="0 0 16 16" class="icon caret"><path d="M4 6l4 4 4-4"/></svg>
+      </button>
+      <div class="dmenu">
+        <button class="ditem" id="btnAiGen" title="文字描述生成墙体/门窗/家具（新建户型文件，不影响当前方案）"><span class="dicon"><svg viewBox="0 0 16 16" class="icon"><path d="M2 13V3h6a3 3 0 013 0h3v7H5a3 3 0 00-3 3z"/></svg></span><span class="dlabel">AI 生成户型…</span><span class="dkb">输入描述即可</span></button>
+        <button class="ditem" id="btnAiStyle" title="文字描述装修风格,AI 给 4 个候选主题,选一个应用"><span class="dicon"><svg viewBox="0 0 16 16" class="icon"><path d="M8 2a6 6 0 100 12 1.4 1.4 0 001-2.5l-.4-.4a1 1 0 010-1.4l.4-.4A1.4 1.4 0 0010 6.5 6 6 0 008 2z"/><circle cx="5" cy="6" r=".7"/><circle cx="3.5" cy="8.5" r=".7"/><circle cx="5.5" cy="11" r=".7"/></svg></span><span class="dlabel">AI 装修风格…</span><span class="dkb">4 个候选,选一个应用</span></button>
+        <button class="ditem" id="btnAiFurn" title="AI 生成家具元数据 + 你上传 GLB,自动入库"><span class="dicon"><svg viewBox="0 0 16 16" class="icon"><path d="M4 11V6h4v5M12 11V8a2 2 0 00-2-2"/><path d="M3 11h10v1.5H3z"/></svg></span><span class="dlabel">AI 生成 3D 家具…</span><span class="dkb">AI 给名,自动入库</span></button>
+      </div>
+    </div>
+    <span class="tbsep"></span>
+    <button class="tb tb-icon" id="btn-view-toggle" aria-pressed="false" title="切换 2D / 3D 视图 (F5 / V)" style="min-width:42px">2D</button>
+    <button class="tb tb-icon hidden" id="btn-reset-view" title="重置视图到默认机位">
+      <svg viewBox="0 0 16 16" class="icon"><path d="M3 8a5 5 0 119.5 2"/><path d="M13 3v4h-4"/></svg>
+    </button>
+    <button class="tb tb-icon" id="btnAppearance" title="外观：深 / 浅 / 跟随系统">
+      <svg viewBox="0 0 16 16" class="icon"><circle cx="8" cy="8" r="6"/><path d="M8 2v12M2 8h12" stroke-width="1"/></svg>
+    </button>
+    <button class="tb tb-icon" id="btnCmd" title="命令面板 (Cmd+P / Ctrl+P)">
+      <svg viewBox="0 0 16 16" class="icon"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
+    </button>
   </div>
 
   <div id="main">
     <div id="rail">
-      <button class="railbtn" data-tool="pan" title="移动画布：左键拖动平移，不选中任何对象"><span class="g">✥</span><span class="t">移动</span></button>
-      <button class="railbtn" data-tool="select" title="选择 / 移动 (F4)"><span class="g">↖</span><span class="t">选择</span></button>
-      <button class="railbtn" data-tool="wall" title="画墙 (F6)"><span class="g">▤</span><span class="t">画墙</span></button>
-      <button class="railbtn" data-tool="door" title="放门 (F7)"><span class="g">◪</span><span class="t">门</span></button>
-      <button class="railbtn" data-tool="window" title="放窗 (F8)"><span class="g">▥</span><span class="t">窗</span></button>
-      <button class="railbtn" data-tool="floor" title="地面 (F11)"><span class="g">▦</span><span class="t">地面</span></button>
-      <button class="railbtn" data-tool="furn" title="家具 (F10)"><span class="g">⌂</span><span class="t">家具</span></button>
-      <button class="railbtn" data-tool="stairs" title="楼梯 (Shift+F11)"><span class="g">⌇</span><span class="t">楼梯</span></button>
-      <div class="railsep"></div>
-      <button class="railbtn" id="btnFiles" title="文件工作区"><span class="g">◫</span><span class="t">文件</span></button>
-      <button class="railbtn" id="btnTheme" title="材质（墙 / 地 / 门窗配色）"><span class="g">🎨</span><span class="t">材质</span></button>
-      <button class="railbtn" id="btnOutline" title="本层大纲 (F12)"><span class="g">▤</span><span class="t">大纲</span></button>
+      <button class="railbtn" data-tool="pan" title="移动画布 (H) — 左键拖动平移"><svg viewBox="0 0 16 16" class="icon"><path d="M5.5 2v6.5M7.5 1.5v11M9.5 4v8M11.5 5v6L10.2 13l-1.7.7H5l-2.5-2 2.5-3"/></svg></button>
+      <button class="railbtn" data-tool="select" title="选择 / 移动 (F4)"><svg viewBox="0 0 16 16" class="icon"><path d="M2 14l5-10 3 4 3 .8"/></svg></button>
+      <button class="railbtn" data-tool="wall" title="画墙 (F6)"><svg viewBox="0 0 16 16" class="icon"><rect x="2" y="3" width="12" height="10" rx="1"/><path d="M2 7h12M2 11h12"/></svg></button>
+      <button class="railbtn" data-tool="door" title="放门 (F7)"><svg viewBox="0 0 16 16" class="icon"><path d="M4 13V3h6v10"/><circle cx="8.6" cy="8" r=".5"/></svg></button>
+      <button class="railbtn" data-tool="window" title="放窗 (F8)"><svg viewBox="0 0 16 16" class="icon"><rect x="2" y="3" width="12" height="10" rx="1"/><path d="M8 3v10M2 8h12"/></svg></button>
+      <button class="railbtn" data-tool="floor" title="地面 (F11)"><svg viewBox="0 0 16 16" class="icon"><path d="M2 5l6-3 6 3v6l-6 3-6-3z"/><path d="M2 5l6 3 6-3M8 8v6"/></svg></button>
+      <button class="railbtn" data-tool="furn" title="家具 (F10)"><svg viewBox="0 0 16 16" class="icon"><path d="M4 11V6h4v5M12 11V8a2 2 0 00-2-2"/><path d="M3 11h10v1.5H3z"/></svg></button>
+      <button class="railbtn" data-tool="stairs" title="楼梯 (Shift+F11)"><svg viewBox="0 0 16 16" class="icon"><path d="M2 14h3v-3h3V8h3V5h3"/></svg></button>
     </div>
+    <nav id="panelTabs" aria-label="面板切换">
+      <button class="panel-tab active" data-panel="outline" title="本层大纲 (F12)">
+        <svg viewBox="0 0 16 16" class="icon"><rect x="2" y="3" width="12" height="2" rx=".5"/><rect x="2" y="7" width="12" height="2" rx=".5"/><rect x="2" y="11" width="12" height="2" rx=".5"/></svg>
+      </button>
+      <button class="panel-tab" data-panel="files" title="文件工作区">
+        <svg viewBox="0 0 16 16" class="icon"><path d="M2 4a1 1 0 011-1h3l1.5 1.5H13a1 1 0 011 1V13a1 1 0 01-1 1H3a1 1 0 01-1-1z"/></svg>
+      </button>
+      <button class="panel-tab" data-panel="theme" title="材质（墙 / 地 / 门窗配色）">
+        <svg viewBox="0 0 16 16" class="icon"><path d="M8 2a6 6 0 100 12 1.4 1.4 0 001-2.5l-.4-.4a1 1 0 010-1.4l.4-.4A1.4 1.4 0 0010 6.5 6 6 0 008 2z"/><circle cx="5" cy="6" r=".7"/><circle cx="3.5" cy="8.5" r=".7"/><circle cx="5.5" cy="11" r=".7"/></svg>
+      </button>
+      <button class="panel-tab" data-panel="inspector" title="属性 (自动跟随选中)">
+        <svg viewBox="0 0 16 16" class="icon"><rect x="2" y="2" width="12" height="12" rx="1.5"/><path d="M5 6h6M5 8h4M5 10h6"/></svg>
+      </button>
+    </nav>
 
     <aside id="outlinePanel">
       <div id="outlineTree">
         <div class="otHead"><b>本层大纲</b><span id="otCount"></span>
-          <button id="otRefresh" title="刷新">⟳</button>
-          <button id="otHideAll" title="全部隐藏">👁‍🗨</button>
-          <button id="otShowAll" title="全部显示">👁</button>
+          <button id="otRefresh" title="刷新"><svg viewBox="0 0 16 16" class="icon"><path d="M3 8a5 5 0 019-3M13 8a5 5 0 01-9 3"/><path d="M12 2v3h-3M4 14v-3h3"/></svg></button>
+          <button id="otHideAll" title="全部隐藏"><svg viewBox="0 0 16 16" class="icon"><path d="M1 8s2-5 7-5 7 5 7 5-2 5-7 5S1 8 1 8z"/><path d="M2 2l12 12"/></svg></button>
+          <button id="otShowAll" title="全部显示"><svg viewBox="0 0 16 16" class="icon"><path d="M1 8s2-5 7-5 7 5 7 5-2 5-7 5S1 8 1 8z"/><circle cx="8" cy="8" r="2"/></svg></button>
         </div>
         <div id="otBody"></div>
       </div>
@@ -2034,10 +2273,17 @@
 
     <aside id="filesPanel" aria-label="文件工作区">
       <div class="fp-head">
-        <span class="fp-title">📁 文件</span>
+        <span class="fp-title">
+          <svg viewBox="0 0 16 16" class="icon"><path d="M2 4a1 1 0 011-1h3l1.5 1.5H13a1 1 0 011 1V13a1 1 0 01-1 1H3a1 1 0 01-1-1z"/></svg>
+          文件
+        </span>
         <div class="fp-actions">
-          <button id="fpNew" class="fp-btn" title="新建文件（另存为选位置）">＋</button>
-          <button id="fpOpen" class="fp-btn" title="从本地打开（.tp3d.json）">⤓</button>
+          <button id="fpNew" class="fp-btn" title="新建文件（另存为选位置）">
+            <svg viewBox="0 0 16 16" class="icon"><path d="M8 3v10M3 8h10"/></svg>
+          </button>
+          <button id="fpOpen" class="fp-btn" title="从本地打开（.tp3d.json）">
+            <svg viewBox="0 0 16 16" class="icon"><path d="M2 4a1 1 0 011-1h3l1.5 1.5H13a1 1 0 011 1V13a1 1 0 01-1 1H3a1 1 0 01-1-1z"/></svg>
+          </button>
         </div>
       </div>
       <div id="fpList" class="fp-list"></div>
@@ -2048,24 +2294,36 @@
 
     <aside id="themePanel" aria-label="材质面板">
       <div class="th-head">
-        <span class="th-title">🎨 材质</span>
+        <span class="th-title">
+          <svg viewBox="0 0 16 16" class="icon"><path d="M8 2a6 6 0 100 12 1.4 1.4 0 001-2.5l-.4-.4a1 1 0 010-1.4l.4-.4A1.4 1.4 0 0010 6.5 6 6 0 008 2z"/><circle cx="5" cy="6" r=".7"/><circle cx="3.5" cy="8.5" r=".7"/><circle cx="5.5" cy="11" r=".7"/></svg>
+          材质
+        </span>
         <span class="th-cur" id="thCur">简洁</span>
-        <button id="thManageBtn" class="th-head-btn" title="管理材质" aria-label="管理材质">⚙</button>
+        <button id="thManageBtn" class="th-head-btn" title="管理材质" aria-label="管理材质">
+          <svg viewBox="0 0 16 16" class="icon"><circle cx="8" cy="8" r="2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.5 1.5M11.5 11.5L13 13M3 13l1.5-1.5M11.5 4.5L13 3"/></svg>
+        </button>
       </div>
       <div class="th-list" id="thList"></div>
       <div class="th-editpane" id="thEditPane" hidden></div>
       <div class="th-foot">
         <div class="th-foot-actions">
           <button class="btn" id="thNewBtn" title="新建材质(基于当前)">＋ 新建</button>
-          <button class="btn" id="thImportBtn" title="导入 .tp3d-themes.json">⤓ 导入</button>
-          <button class="btn full" id="thExportBtn" title="导出全部自定义材质">⤒ 导出全部</button>
+          <button class="btn" id="thImportBtn" title="导入 .tp3d-themes.json">
+            <svg class="icon" viewBox="0 0 16 16"><path d="M8 2v9m0 0l-3-3m3 3l3-3M3 13h10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>导入
+          </button>
+          <button class="btn full" id="thExportBtn" title="导出全部自定义材质">
+            <svg class="icon" viewBox="0 0 16 16"><path d="M8 11V2m0 0L5 5m3-3l3 3M3 13h10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>导出全部
+          </button>
         </div>
         <span class="th-hint" style="display:block;margin-top:6px">材质会应用到现有对象;在 Inspector 手动改色属于自定义</span>
       </div>
     </aside>
     <div id="themeMenu" role="menu" aria-hidden="true"></div>
 
-    <div id="fsBanner" hidden>⚠ 当前浏览器不支持多文件工作区。请使用 Chrome 或 Edge。<br><small>Ctrl+O 仍可导入单文件 JSON。</small></div>
+    <div id="fsBanner" hidden>
+  <svg viewBox="0 0 16 16" class="icon" style="vertical-align:-2px;color:var(--warn)"><path d="M8 2l7 12H1z"/><path d="M8 7v3M8 12v.1"/></svg>
+  当前浏览器不支持多文件工作区。请使用 Chrome 或 Edge。<br><small>Ctrl+O 仍可导入单文件 JSON。</small>
+</div>
 
     <div id="inspector"><div id="propsBody"></div></div>
 
@@ -2078,15 +2336,23 @@
         <div id="overlay"></div>
       </div>
       <svg id="svg2d" xmlns="http://www.w3.org/2000/svg"></svg>
-      <button id="btnFs" class="fsbtn" type="button" title="全屏预览此 3D 区域（再次点击退出）" aria-label="toggle fullscreen">⤢</button>
+      <button id="btnFs" class="fsbtn" type="button" title="全屏预览此 3D 区域（再次点击退出）" aria-label="toggle fullscreen">
+  <svg viewBox="0 0 16 16" class="icon"><path d="M2 6V2h4M14 6V2h-4M2 10v4h4M14 10v4h-4"/></svg>
+</button>
     </div>
   </div>
 
   <div id="statusbar">
     <span id="hint"></span>
-    <span id="undoTip" title=""></span>
+    <span id="undoTip" title="" hidden></span>
     <span id="coords"></span>
-    <span id="keys">F1帮助 · F2存 · F3开 · F5视图 · F6墙 · F7门 · F8性能 · F10家具 · F11地面</span>
+    <span id="keys">
+      <kbd>Cmd</kbd>+<kbd>P</kbd> 命令 ·
+      <kbd>F1</kbd> 帮助 ·
+      <kbd>F5</kbd> 视图 ·
+      <kbd>双指</kbd> 缩放 ·
+      <kbd>拖动</kbd> 平移
+    </span>
     <span id="unsavedDot" title="有未保存修改"></span>
   </div>
 </div>
@@ -2096,9 +2362,9 @@
   <div class="ap-panel">
     <div class="ap-title">外观</div>
     <div class="ap-desc">选择浅色、深色或跟随系统</div>
-    <div class="ci" data-app="light"><span class="ico">☀</span>浅色<span class="check">✓</span></div>
-    <div class="ci" data-app="dark"><span class="ico">🌙</span>深色<span class="check">✓</span></div>
-    <div class="ci" data-app="auto"><span class="ico">💻</span>跟随系统<span class="check">✓</span></div>
+    <div class="ci" data-app="light"><span class="ico"><svg viewBox="0 0 16 16" class="icon"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3"/></svg></span>浅色<span class="check"><svg viewBox="0 0 16 16" class="icon"><path d="M3 8l3 3 7-7"/></svg></span></div>
+    <div class="ci" data-app="dark"><span class="ico"><svg viewBox="0 0 16 16" class="icon"><path d="M13 10a5 5 0 01-7-7 5 5 0 107 7z"/></svg></span>深色<span class="check"><svg viewBox="0 0 16 16" class="icon"><path d="M3 8l3 3 7-7"/></svg></span></div>
+    <div class="ci" data-app="auto"><span class="ico"><svg viewBox="0 0 16 16" class="icon"><rect x="2" y="3" width="12" height="8" rx="1"/><path d="M6 14h4M8 11v3"/></svg></span>跟随系统<span class="check"><svg viewBox="0 0 16 16" class="icon"><path d="M3 8l3 3 7-7"/></svg></span></div>
     <button class="ap-close" id="appearanceClose">关闭</button>
   </div>
 </div>
@@ -2106,7 +2372,7 @@
 
 <!-- 性能监控面板(右上角,F8 切换显示;默认隐藏) -->
 <div id="perfPanel" hidden>
-  <div class="perfHead">Perf <span id="perfToggle" title="折叠/展开">▾</span></div>
+  <div class="perfHead">Perf <span id="perfToggle" title="折叠/展开"><svg viewBox="0 0 16 16" class="icon" style="width:12px;height:12px"><path d="M4 6l4 4 4-4"/></svg></span></div>
   <div class="perfBody">
     <div><span class="pl">FPS</span><span id="perfFps">—</span></div>
     <div><span class="pl">MS</span><span id="perfMs">—</span></div>
@@ -2114,6 +2380,7 @@
     <div><span class="pl">Tris</span><span id="perfTris">—</span></div>
     <div><span class="pl">Geos</span><span id="perfGeos">—</span></div>
     <div><span class="pl">Rebuild</span><span id="perfRebuild">—</span></div>
+    <div id="perfPresetRow"><span class="pl">画质</span><span id="perfPreset" role="button" tabindex="0" title="点击切换 realtime ⇄ photo">—</span></div>
   </div>
 </div>
 
@@ -2140,6 +2407,7 @@
 <div id="cmdPalette" hidden>
   <div class="cmd-mask"></div>
   <div class="cmd-panel">
+    <svg viewBox="0 0 16 16" class="icon cmd-search-icon"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
     <input id="cmdInput" placeholder="输入命令或搜索（Cmd+P / Ctrl+P）…" autocomplete="off">
     <div id="cmdList"></div>
     <div class="cmd-foot">↑↓ 选择 · Enter 执行 · Esc 关闭</div>
