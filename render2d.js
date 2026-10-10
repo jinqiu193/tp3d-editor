@@ -10,6 +10,97 @@ let _doc = null;
 let _view = { minX: -10, maxX: 10, minZ: -10, maxZ: 10, w: 800, h: 600 };
 let _palette = null;
 let _dirty = false;
+let _patternCache = new Map();   // key -> SVG pattern element
+
+// ── 颜色工具（与 main.js 保持一致）─────────────────────
+function _hexToRgb(hex) {
+  const h = (hex || '#cccccc').replace('#', '');
+  const n = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+function _mixRgb(a, b, t) {
+  return { r: Math.round(a.r + (b.r - a.r) * t), g: Math.round(a.g + (b.g - a.g) * t), b: Math.round(a.b + (b.b - a.b) * t) };
+}
+function _rgbCss(c, a = 1) {
+  return a < 1 ? `rgba(${c.r},${c.g},${c.b},${a.toFixed(2)})` : `rgb(${c.r},${c.g},${c.b})`;
+}
+function _lighten(hex, t) { return _rgbCss(_mixRgb(_hexToRgb(hex), { r: 255, g: 255, b: 255 }, t)); }
+function _darken(hex, t) { return _rgbCss(_mixRgb(_hexToRgb(hex), { r: 0, g: 0, b: 0 }, t)); }
+function _fill(id, el) { el.setAttribute('fill', `url(#${id})`); }
+
+// ── SVG Pattern 生成器 ─────────────────────────────────
+function _buildWoodPattern(id, hex) {
+  const c = _hexToRgb(hex), d = _darken(hex, 0.22);
+  const els = [`<rect width="256" height="256" fill="${_rgbCss(c)}"/>`];
+  // 竖向木纹线条（用窄矩形模拟，比 SVG line 更稳定）
+  for (let x = 1; x < 256; x += 4) {
+    const t = (Math.sin(x * 0.45) + Math.sin(x * 0.18 + 1.7)) * 0.5;
+    const a = 0.03 + Math.abs(t) * 0.08;
+    els.push(`<rect x="${x}" y="0" width="1" height="256" fill="${_rgbCss(d, a)}"/>`);
+  }
+  // 宽带木纹（用不透明度渐变矩形叠加）
+  for (let i = 0; i < 3; i++) {
+    const rx = (i * 137 + 23) % 220 + 10, rw = 60 + (i * 41) % 50;
+    els.push(`<rect x="${rx}" y="0" width="${rw}" height="256" fill="${_rgbCss(d, 0.06)}"/>`);
+  }
+  return `<pattern id="${id}" x="0" y="0" width="256" height="256" patternUnits="userSpaceOnUse">` +
+    els.join('') +
+    `</pattern>`;
+}
+
+function _buildGridPattern(id, hex) {
+  const c = _hexToRgb(hex), l = _lighten(hex, 0.10), a = _lighten(hex, 0.08);
+  return `<pattern id="${id}" x="0" y="0" width="128" height="128" patternUnits="userSpaceOnUse">` +
+    `<rect width="128" height="128" fill="${_rgbCss(c)}"/>` +
+    `<rect x="2" y="2" width="124" height="124" fill="none" stroke="${_rgbCss(c, 0.55)}" stroke-width="2"/>` +
+    `<line x1="64" y1="6" x2="64" y2="122" stroke="${_rgbCss(c, 0.85)}" stroke-width="3"/>` +
+    `<line x1="6" y1="64" x2="122" y2="64" stroke="${_rgbCss(c, 0.85)}" stroke-width="3"/>` +
+    `<circle cx="8" cy="8" r="3" fill="${_rgbCss(c, 0.50)}"/>` +
+    `<circle cx="120" cy="8" r="3" fill="${_rgbCss(c, 0.50)}"/>` +
+    `<circle cx="8" cy="120" r="3" fill="${_rgbCss(c, 0.50)}"/>` +
+    `<circle cx="120" cy="120" r="3" fill="${_rgbCss(c, 0.50)}"/>` +
+    `</pattern>`;
+}
+
+function _buildTilePattern(id, hex) {
+  const c = _hexToRgb(hex), g = _lighten(hex, 0.06);
+  const gap = 8, ts = 56;
+  return `<pattern id="${id}" x="0" y="0" width="${ts + gap}" height="${ts + gap}" patternUnits="userSpaceOnUse">` +
+    `<rect width="${ts + gap}" height="${ts + gap}" fill="${_rgbCss(g)}"/>` +
+    `<rect x="${gap / 2}" y="${gap / 2}" width="${ts}" height="${ts}" fill="${_rgbCss(c)}" stroke="${_rgbCss(g)}" stroke-width="1.5"/>` +
+    `<rect x="${ts + gap / 2}" y="${gap / 2}" width="${ts}" height="${ts}" fill="${_rgbCss(c)}" stroke="${_rgbCss(g)}" stroke-width="1.5"/>` +
+    `<rect x="${gap / 2}" y="${ts + gap / 2}" width="${ts}" height="${ts}" fill="${_rgbCss(c)}" stroke="${_rgbCss(g)}" stroke-width="1.5"/>` +
+    `<rect x="${ts + gap / 2}" y="${ts + gap / 2}" width="${ts}" height="${ts}" fill="${_rgbCss(c)}" stroke="${_rgbCss(g)}" stroke-width="1.5"/>` +
+    `</pattern>`;
+}
+
+function _getPatternId(tex, hex) {
+  if (!tex) return null;
+  return `r2d_pat_${tex}_${(hex || '#ccc').replace('#', '')}`;
+}
+
+function _buildPatternSvg(tex, hex) {
+  const id = _getPatternId(tex, hex);
+  if (!id) return null;
+  if (_patternCache.has(id)) return id;
+  let svg = '';
+  if (tex === 'wood') svg = _buildWoodPattern(id, hex);
+  else if (tex === 'grid') svg = _buildGridPattern(id, hex);
+  else if (tex === 'tile') svg = _buildTilePattern(id, hex);
+  else return null;
+  _patternCache.set(id, svg);
+  return id;
+}
+
+function _renderDefs(append) {
+  const defs = _createSvg('defs', {});
+  for (const svgStr of _patternCache.values()) {
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = svgStr;
+    while (wrapper.firstChild) defs.appendChild(wrapper.firstChild);
+  }
+  append(defs);
+}
 let _rafId = null;
 let _panning = false;       // 平移模式：拖动中跳过全量重建，仅用 transform 偏移
 let _panTx = 0, _panTy = 0; // 累积平移偏移（SVG px）
@@ -42,6 +133,8 @@ function _expose() {
       panBy, panByFast, beginPan, endPan, zoomAt, fitToContent,
       setSelection, setHover, getSelection, getHover,
       markDirty, renderPlan, on,
+      _buildWoodPattern, _buildTilePattern, _buildGridPattern,
+      _hexToRgb, _lighten, _darken,
     };
   }
 }
@@ -255,16 +348,28 @@ function scheduleRender() {
 
 export function renderPlan() {
   if (!_svg) return;
-  // 全量重建 — 蓝图 Render2D.js 风格;浏览器自动合并重排
   while (_svg.firstChild) _svg.removeChild(_svg.firstChild);
   _svg.setAttribute('viewBox', `0 0 ${_view.w} ${_view.h}`);
   _svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
+  // defs 必须作为 svg 根的直接子元素，不放在 content g 里
+  const defs = _createSvg('defs', {});
+  _svg.appendChild(defs);
+
   const content = _createSvg('g', { id: 'r2d-content' });
   _svg.appendChild(content);
-
   const _append = content.appendChild.bind(content);
 
+  // 收集当前 render 所需的 pattern，先渲染 defs
+  const _renderDefs = (f) => {
+    for (const svgStr of _patternCache.values()) {
+      const w = document.createElement('div');
+      w.innerHTML = svgStr;
+      while (w.firstChild) f(w.firstChild);
+    }
+  };
+
+  _renderDefs(defs.appendChild.bind(defs));
   _renderGrid(_append);
   _renderFloors(_append);
   _renderStairs(_append);
@@ -331,11 +436,14 @@ function _renderFloors(append) {
     const w = Math.abs(x2 - x1), h = Math.abs(z2 - z1);
     const isSel = _isSel('floor', fi);
     const cls = `floor-rect${isSel ? ' selected' : ''}`;
+    const hex = f.color || '#c3cfdc';
+    const patId = _buildPatternSvg(f.tex || '', hex);
+    const fill = patId ? `url(#${patId})` : (isSel ? _palette.floorSel : _palette.floor);
     layer.appendChild(_createSvg('rect', {
       x, y, width: w, height: h,
       class: cls,
       'data-floor-id': fi,
-      fill: isSel ? _palette.floorSel : (_palette.floor),
+      fill,
       stroke: isSel ? _palette.wallSel : 'transparent',
       'stroke-width': isSel ? 1.5 : 0,
     }));
