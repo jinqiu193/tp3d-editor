@@ -693,6 +693,44 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             os.remove(path)
         return {'ok': True}
 
+    def _stream_ai_chat(self, body):
+        req = json.loads(body.decode('utf-8'))
+        key = _load_ai_key()
+        if not key:
+            return self._json({'error': 'API key not found. Put your MiniMax API key in ~/.auto-coder/keys/minimax_m3-1-flash-preview'}, 500)
+        url = AI_BASE_URL.rstrip('/') + '/anthropic/v1/messages'
+        headers = {
+            'Authorization': 'Bearer ' + key,
+            'Content-Type': 'application/json',
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true',
+        }
+        payload = {
+            'model': 'MiniMax-M2.7',
+            'max_tokens': req.get('max_tokens', 8192),
+            'stream': True,
+            'system': req.get('system', ''),
+            'messages': [{'role': 'user', 'content': req.get('user', '')}],
+        }
+        try:
+            rq = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'),
+                                        method='POST', headers=headers)
+            resp = urllib.request.urlopen(rq, timeout=AI_TIMEOUT)
+        except Exception as e:
+            return self._json({'error': str(e)}, 500)
+        self.send_response(200)
+        self.send_header('Content-Type', 'text/plain; charset=utf-8')
+        self.send_header('Transfer-Encoding', 'chunked')
+        self.send_header('Cache-Control', 'no-store')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.end_headers()
+        while True:
+            chunk = resp.read(4096)
+            if not chunk:
+                break
+            self.wfile.write(chunk)
+            self.wfile.flush()
+
     def _json(self, obj, code=200):
         data = json.dumps(obj, ensure_ascii=False).encode('utf-8')
         self.send_response(code)
@@ -738,6 +776,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self._json(_api_ai_style(body))
             if u.path == '/api/ai/furniture-meta':
                 return self._json(_api_ai_furniture_meta(body))
+            if u.path == '/api/ai/chat':
+                return self._stream_ai_chat(body)
             if u.path == '/api/items/del':
                 return self._json(_api_items_del(u.query))
         except ValueError as e:

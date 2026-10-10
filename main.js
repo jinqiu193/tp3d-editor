@@ -1441,7 +1441,9 @@ globalThis.snapFurn = snapFurn;       // 暴露吸附函数给 e2e
     let nx = x, nz = z, nr = furnRot;
 
     pushUndo();
-    doc.furniture.push({ type, x: nx, z: nz, rot: nr, lv: activeLv });
+    // 显式 y:0:新放置的家具一律贴地,避免 ceiling light / shower 之类的
+    // def.yOff 把模型顶到半空或埋入地下。f.y 可在 inspector 覆写为任意高度。
+    doc.furniture.push({ type, x: nx, z: nz, y: 0, rot: nr, lv: activeLv });
     // 与点击放置行为一致:不自动选中(用户可继续放置,左侧家具库面板保持可见)
     rebuild(); refreshProps();
     return { x: nx, z: nz, rot: nr };
@@ -1901,7 +1903,7 @@ function _refreshContactShadows(doc) {
     const sc = (def.scale || 1) * (f.sc || 1);
     const w = Math.max(0.2, (def.w || 0.5) * sc);
     const d = Math.max(0.2, (def.d || 0.5) * sc);
-    const y = levelY(f.lv || 0) + (def.yOff || 0);
+    const y = levelY(f.lv || 0) + (f.y != null ? f.y : (def.yOff || 0));
     const rot = f.rot || 0;
     const visible = !_isHidden('furn', fi);
     const csHash = `${f.type}|${f.x}|${f.z}|${y}|${rot}|${sc}|${visible}`;
@@ -3480,25 +3482,13 @@ async function importPlanHtml() {
 }
 
 // ── AI 转换外部 3D HTML ───────────────────────────────────────
-// 浏览器端直接调 minimaxi 的 Anthropic Messages API 兼容反代
-// (TODO 上线前: key 移到后端代理或用户本地设置)
+// 通过后端 /api/ai/chat 代理调用 MiniMax API，密钥留在本地不暴露
 async function _aiCallClaude({ system, user, max_tokens = 8192 }) {
-  const url = 'https://api.minimaxi.com/anthropic/v1/messages';
-  const headers = {
-    'content-type': 'application/json',
-    'x-api-key': 'sk-cp-PUYHH6AHVJ97o5GLyBAHOo9zYxVboopS3y6bHm41zyTIsZNvjAb1tFafBq0WgYIoImszU_8ICoZZNuuGG5hf4xaQWnoIvbaM0ljbcDCSpf7_b3_sgqrR2mw',
-    'anthropic-version': '2023-06-01',
-    'anthropic-dangerous-direct-browser-access': 'true',
-  };
-  const resp = await fetch(url, {
-    method: 'POST', headers,
-    body: JSON.stringify({
-      model: 'MiniMax-M2.7',
-      max_tokens,
-      stream: true,
-      system: [{ type: 'text', text: system }],
-      messages: [{ role: 'user', content: user }],
-    }),
+  // 密钥已移至后端 _serve.py，前端不再持有任何 API Key
+  const resp = await fetch('/api/ai/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ system, user, max_tokens }),
   });
   if (!resp.ok) {
     const t = await resp.text().catch(() => '');
@@ -3663,7 +3653,7 @@ ${jsCode}
     catch (e) {
       tip.close?.();
       const msg = /Failed to fetch|NetworkError|CORS/i.test(e.message)
-        ? 'AI 接口跨域被拒或网络中断。可能原因:① minimaxi 未开放浏览器跨域;② 网络问题。请联系作者或自备本地反代服务。'
+        ? '后端 API 连接失败。请确认 _serve.py 已启动（端口 8137 或 8765）。'
         : 'AI 调用失败: ' + e.message;
       return flash(msg, 'error', 7000);
     }
@@ -5417,6 +5407,12 @@ const furnBBox = {};
 function _captureFurnProto(type, buildFn) {
   const proto = { parts: [], bbox: null };
   const g = buildFn();
+  // 临时归零 root 的 position,因为 loadGLB 把 g.position.y 设成了 -box.min.y,
+  // 导致 setFromObject 算出的"世界 bbox"已经被抬到 min.y=0,会让我们错以为无需 shift。
+  // 这里要在 GLB 自己的"设计空间"里算 bbox(尚未被抬升),这样 shift 量才正确。
+  // 注:此处的 g 是 glbBuild 返回的 clone,改它的 position 不影响 _glbCache。
+  const _savedPos = g.position.clone();
+  g.position.set(0, 0, 0);
   g.updateMatrixWorld(true);
   const bbox = new THREE.Box3();
   g.traverse(o => {
@@ -5430,21 +5426,36 @@ function _captureFurnProto(type, buildFn) {
         cast: o.castShadow !== false,
         localMatrix: o.matrix.clone(),
       });
-      // 参与整体 bbox
-      const wb = new THREE.Box3().setFromObject(o);
-      bbox.union(wb);
+      // 用 mesh 的 LOCAL matrix(不是 world)算 bbox——
+      // 因为 InstancedMesh 用的是 o.matrix,而 dummy 还有自己的 scale(FURN.scale)。
+      // 如果用 world bbox 算 shift,会把父节点的 translation/scale 都减掉,导致
+      // dummy.scale * (shift + geo.y) ≠ 0,模型仍埋地。
+      // 正确做法:shift 量应该是 -(o.matrix * geo.bbox).min.y,这样
+      // dummy * (shift * o.matrix) * geo 的最低点 = dummy * 0 = 0。
+      if (!o.geometry.boundingBox) o.geometry.computeBoundingBox();
+      const lb = new THREE.Box3().copy(o.geometry.boundingBox).applyMatrix4(o.matrix);
+      bbox.union(lb);
     }
   });
-  // 把 bbox 平移到原点 = bbox 中心,尺寸 = bbox 范围
-  const center = new THREE.Vector3();
+  // 恢复 root 的 position(虽然 clone 之后会被丢弃,但保持语义干净)
+  g.position.copy(_savedPos);
+  g.updateMatrixWorld(true);
+  // 把每个 part 的 localMatrix 减去 bbox 最小角(锚点改为"模型底面"而非中心)。
+  // 这样 InstancedMesh 的 instance y 位置 = 模型的底面 y 位置;f.y=0 表示
+  // "底面贴地",淋浴(高 2.06m)、壁挂电视(tvFlat)、医院病床等几何在地面以上。
+  // 修复背景:第一版用 setFromObject 算 world bbox,但 loadGLB 已把 root.position.y 抬到 -box.min.y,
+  // 导致 world bbox.min.y=0,shift 量=0,GLB 内 y<0 的 part 仍埋地;
+  // 第二版改为 o.matrix 算 local bbox,正确锚定在 InstancedMesh 内的 mesh 局部空间。
+  const min = bbox.min;
   const size = new THREE.Vector3();
-  bbox.getCenter(center);
   bbox.getSize(size);
-  // 把每个 part 的 localMatrix 减去 center(让所有 part 以 bbox 中心为参考)
   for (const part of proto.parts) {
-    const m = new THREE.Matrix4().makeTranslation(-center.x, -center.y, -center.z);
+    const m = new THREE.Matrix4().makeTranslation(-min.x, -min.y, -min.z);
     part.localMatrix.premultiply(m);
   }
+  // bbox 报告用 center(给 raycast / contact shadow 几何参考),但锚点语义改了
+  const center = new THREE.Vector3();
+  bbox.getCenter(center);
   proto.bbox = { center, size };
   return proto;
 }
@@ -6398,7 +6409,7 @@ function rebuild3D() {
     const def = FURN[f.type];
     if (!def) return;
     const visible = !_isHidden('furniture', fi) && (lvMode !== 'solo' || (f.lv || 0) === activeLv);
-    const y = levelY((f.lv || 0)) + (def.yOff || 0);
+    const y = levelY((f.lv || 0)) + (f.y != null ? f.y : (def.yOff || 0));
     const baseSc = def.scale || 1;
     const userSc = f.scale != null ? f.scale : 1;
     const sc = baseSc * userSc;
@@ -6798,13 +6809,17 @@ function clearFloorPreview() {
 function updateFurnGhost(p, typeOverride) {
   const def = FURN[typeOverride || furnType];
   if (!def) return;
+  // 虚影 y 与新放置的家具 y 同步:furnType 当前正在放置的模型,与 placeFurnAt
+  // / 2D 点击放置行为一致(= f.y ?? def.yOff,新放置 f.y=0)。这样 ceiling light
+  // 之类会有 yOff 的模型,虚影会显示在原设计高度(2.4m),而不是误导用户贴在地面。
+  const ghostY = (def.yOff || 0);
   if (!ghost) {
     ghost = new THREE.Group();
-    addLocal(ghost, box(def.w, 1.0, def.d), M.ghost, 0, 0.5, 0, false);
+    addLocal(ghost, box(def.w, Math.max(0.3, def.h || 1.0), def.d), M.ghost, 0, 0, 0, false);
     ghost.traverse(o => { o.renderOrder = 999; });
     scene.add(ghost);
   }
-  ghost.position.set(p.x - CX, levelY(activeLv), p.z - CZ);
+  ghost.position.set(p.x - CX, levelY(activeLv) + ghostY, p.z - CZ);
   ghost.rotation.y = furnRot;
 }
 // 门/窗放置预览：仅在已选中的目标墙上滑动，严格平行于该墙
@@ -7351,7 +7366,9 @@ renderer.domElement.addEventListener('pointerdown', e => {
     const def = FURN[furnType];
 
     pushUndo();
-    doc.furniture.push({ type: furnType, x: nx, z: nz, rot: furnRot, lv: activeLv });
+    // 显式 y:0:新放置的家具一律贴地,避免 ceiling light / shower 之类 def.yOff
+    // 把模型顶到半空或埋入地下。f.y 可在 inspector 覆写为任意高度。
+    doc.furniture.push({ type: furnType, x: nx, z: nz, y: 0, rot: furnRot, lv: activeLv });
     // 不自动选中新放置的家具: 用户连续放置同一类家具时,左侧家具库面板保持可见,
     // 想编辑已放置家具时再点击它即可。
     rebuild(); refreshProps();
@@ -7365,7 +7382,8 @@ renderer.domElement.addEventListener('pointerdown', e => {
       const def = FURN[stairFurn];
 
       pushUndo();
-      doc.furniture.push({ type: stairFurn, x: nx, z: nz, rot: furnRot, lv: activeLv });
+      // 显式 y:0:新放置的家具一律贴地（与普通 furn 工具同语义,可在 inspector 改）
+      doc.furniture.push({ type: stairFurn, x: nx, z: nz, y: 0, rot: furnRot, lv: activeLv });
       clearGhost();   // 收虚影,可连续放置
       rebuild(); refreshProps();
       return;
@@ -8628,8 +8646,14 @@ function refreshProps() {
   if (!sel && tool === 'furn') {
     const q = (_furnSearch || '').toLowerCase();
     const onKey = (k) => furnType === k;
-    const item = (k, d) => `<button class="fitem ${onKey(k) ? 'active' : ''}" data-furn="${k}">
-        <span class="em">${d.icon || ICON.cube}</span>${d.name}${d.custom ? `<span class="fdel" data-fdel="${d.custom}" title="删除此模型">${ICON.x}</span>` : ''}</button>`;
+    const item = (k, d) => {
+      // 吸顶 / 嵌入模型:在名字后加小角标,提示用户该模型默认不在地面
+      let tag = '';
+      if (d.yOff && d.yOff > 0.5) tag = `<span class="ftag" title="默认吸顶高度 ${d.yOff}m,放置后可在属性面板改">↑${d.yOff}m</span>`;
+      else if (d.yOff && d.yOff < -0.1) tag = `<span class="ftag" title="默认贴地以下 ${Math.abs(d.yOff)}m,放置后可在属性面板改">↓${Math.abs(d.yOff)}m</span>`;
+      return `<button class="fitem ${onKey(k) ? 'active' : ''}" data-furn="${k}">
+        <span class="em">${d.icon || ICON.cube}</span>${d.name}${tag}${d.custom ? `<span class="fdel" data-fdel="${d.custom}" title="删除此模型">${ICON.x}</span>` : ''}</button>`;
+    };
     // 按 cat 分组
     const groups = {};
     Object.entries(FURN).forEach(([k, d]) => {
@@ -9062,6 +9086,11 @@ function refreshProps() {
     const f = doc.furniture[sel.fi], def = FURN[f.type];
     const locked = !!f.locked;
     const flv = f.lv || 0;
+    // f.y 是用户覆写的 Y 偏移(优先于 def.yOff),未设置时显示 def.yOff 默认值
+    const effY = f.y != null ? f.y : (def?.yOff || 0);
+    const isCustomY = f.y != null;
+    const designY = def?.yOff || 0;
+    const designHint = designY ? `（设计高度 ${designY.toFixed(1)}m）` : '';
     const options = Object.entries(FURN).map(([k, v]) =>
       `<option value="${k}" ${k === f.type ? 'selected' : ''}>${v.icon} ${v.name}</option>`).join('');
     propsBody.innerHTML = `
@@ -9071,6 +9100,7 @@ function refreshProps() {
         <div class="frow"><label>类型</label><select id="pFType" style="max-width:160px">${options}</select></div>
         <div class="frow"><label>中心 X (m)</label><input id="pFX" type="number" step="0.05" value="${(f.x || 0).toFixed(2)}"></div>
         <div class="frow"><label>中心 Z (m)</label><input id="pFZ" type="number" step="0.05" value="${(f.z || 0).toFixed(2)}"></div>
+        <div class="frow"><label>高度 Y (m)</label><input id="pFY" type="number" step="0.05" value="${effY.toFixed(2)}" title="${designHint}"></div>
         <div class="frow"><label>角度 (°)</label><input id="pFRot" type="number" step="15" value="${Math.round((f.rot || 0) * 180 / Math.PI)}"></div>
         <div class="frow"><label>缩放</label><input id="pFSc" type="number" step="0.1" min="0.3" max="3" value="${(f.scale || 1).toFixed(2)}"></div>
         <div class="frow"><label>楼层</label><input id="pFLv" type="number" step="1" min="0" max="20" value="${flv}"></div>
@@ -9079,18 +9109,22 @@ function refreshProps() {
           <button id="pFLockY" class="${locked ? 'on' : ''}">是</button>
           <button id="pFLockN" class="${!locked ? 'on' : ''}">否</button></div></div>
       </details>
+      <div class="note">高度 Y：${isCustomY ? '已自定义' : '使用设计高度'}${designHint}。吸顶灯默认 2.4m,落地家具默认 0m。</div>
+      <div class="btnrow"><button class="btn" id="pFYReset" title="还原为模型设计高度">↺ 还原设计高度 (${designY.toFixed(1)}m)</button></div>
       <div class="note">F4 选择工具下可直接拖动移动；R 顺时针转 45°（Shift+R 逆时针，自动对齐 45° 网格）。</div>
       <div class="btnrow"><button class="btn" id="pRot">旋转 45° (R)</button></div>
       <div class="btnrow"><button class="btn" id="pDel">删除 (Del)</button></div>`;
     const selType = document.getElementById('pFType');
-    if (selType) selType.addEventListener('change', () => { pushUndo(); f.type = selType.value; rebuild(); refreshProps(); });
+    if (selType) selType.addEventListener('change', () => { pushUndo(); f.type = selType.value; delete f.y; rebuild(); refreshProps(); });
     bindNum('pFX', v => { f.x = v; rebuild(); });
     bindNum('pFZ', v => { f.z = v; rebuild(); });
+    bindNum('pFY', v => { f.y = v; rebuild(); refreshProps(); });
     bindNum('pFRot', v => { f.rot = (v % 360) * Math.PI / 180; rebuild(); refreshProps(); });
     bindNum('pFSc', v => { f.scale = Math.max(0.3, Math.min(3, v)); rebuild(); });
     bindNum('pFLv', v => { f.lv = Math.max(0, Math.round(v)); rebuild(); refreshProps(); });
     $('pFLockY').onclick = () => { pushUndo(); f.locked = true; rebuild(); refreshProps(); };
     $('pFLockN').onclick = () => { pushUndo(); delete f.locked; rebuild(); refreshProps(); };
+    $('pFYReset').onclick = () => { pushUndo(); delete f.y; rebuild(); refreshProps(); };
     $('pRot').onclick = () => { pushUndo(); f.rot = stepRot45(f.rot || 0, 1); rebuild(); refreshProps(); };
     $('pDel').onclick = () => { pushUndo(); doc.furniture.splice(sel.fi, 1); sel = null; rebuild(); refreshProps(); };
     return;
@@ -11779,7 +11813,7 @@ if (typeof ResizeObserver !== 'undefined') {
 
 // ── 后端连通性自检：加载时探测 /api/ai/style 是否可达;不在 8765 上时给顶部警告条 ──
 (async () => {
-  const expected = ['localhost:8765', '127.0.0.1:8765'];
+  const expected = ['localhost:8765', '127.0.0.1:8765', 'localhost:8137', '127.0.0.1:8137'];
   const here = location.host;
   // 只在用户怀疑的环境提示一次,免打扰
   if (!expected.includes(here)) {
